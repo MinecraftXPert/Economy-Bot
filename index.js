@@ -1197,8 +1197,11 @@ client.on("messageCreate", async (message) => {
       sellNumSolana = storage[message.author.id].solana;
     }
 
-    if (!sellNumSolana) {
+    if (!sellNumSolana && args[0] != "all") {
       message.channel.send("Please specify \"all\" or the amount of Solana you want to sell");
+      return;
+    }else if(!sellNumSolana){
+      message.channel.send("You do not have any Solana to sell");
       return;
     }
 
