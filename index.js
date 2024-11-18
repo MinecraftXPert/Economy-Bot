@@ -857,6 +857,39 @@ client.on("messageCreate", async (message) => {
       .setTimestamp();
 
     message.channel.send({ embeds: [embed] });
+
+
+    const solanaLeaderboard = guildMembers
+      .sort((a, b) => {
+        const totalAmountA = storage[a.id].solana;
+        const totalAmountB = storage[b.id].solana;
+        return totalAmountB - totalAmountA;
+      })
+      .first(10); // Get the top 10 members based on their total amount
+
+    const solanaEmbed = new EmbedBuilder()
+      .setColor("Green")
+      .setAuthor({
+        name: `${message.author.username}`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+        url: `https://discord.com/users/${message.author.id}`,
+      })
+      .setTitle(`Solana leaderboard for ${message.guild.name}`)
+      .setDescription(
+        leaderboard
+          .map(
+            (member, index) =>
+              `${index + 1}. ${
+                member.user.username
+              } - <:points:1102646967659659294> ${
+                storage[member.id].solana
+              }`
+          )
+          .join("\n")
+      )
+      .setTimestamp();
+
+    message.channel.send({ embeds: [solanaEmbed] });
   }
 
   if (command === "withdraw" || command === "with") {
