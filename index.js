@@ -88,6 +88,10 @@ function save() {
   fs.writeFileSync("./storage.json", JSON.stringify(storage));
 }
 
+function backup() {
+  fs.writeFileSync("./backup.json", JSON.stringify(storage));
+}
+
 function randomNumFromInterval(min, max) {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -1296,6 +1300,12 @@ client.on("messageCreate", async (message) => {
     .setTimestamp()
 
     message.channel.send({ embeds: [embed] });
+  }
+
+  if(command === "backup" && storage[message.author.id].contributor){
+    backup();
+    message.channel.send("Data succesfully backed up to \"backup.json\"");
+    return;
   }
 
   // if (command === "give" || command === "donate") {
