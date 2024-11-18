@@ -1304,7 +1304,7 @@ client.on("messageCreate", async (message) => {
 
   if(command === "backup" && storage[message.author.id].contributor){
     backup();
-    message.channel.send("Data succesfully backed up to \"backup.json\"");
+    message.channel.send("Data succesfully backed up to `./backup.json`");
     return;
   }
 
