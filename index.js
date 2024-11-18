@@ -94,7 +94,7 @@ function randomNumFromInterval(min, max) {
 }
 
 function updateSolana() {
-  costOfSolana = randomNumFromInterval(150, 300).toString();
+  costOfSolana = randomNumFromInterval(150, 200).toString();
 }
 
 setInterval(updateSolana, 5 * 60 * 1000); // updates cost of solana every 5 minutes
