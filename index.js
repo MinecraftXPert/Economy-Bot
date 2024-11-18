@@ -17,6 +17,8 @@ const { ActivityType } = require("discord.js");
 
 const JOE = "682984131176431786";
 
+// test again
+
 const prefix = "$";
 const timer = {};
 const crimeTimer = {};
