@@ -1,4 +1,3 @@
-
 const {
   Client,
   GatewayIntentBits,
@@ -17,6 +16,8 @@ const TOKEN = process.env.DISCORD_TOKEN;
 const { ActivityType } = require("discord.js");
 
 const JOE = "682984131176431786";
+
+// test again
 
 const prefix = "$";
 const timer = {};
@@ -98,7 +99,7 @@ function randomNumFromInterval(min, max) {
 }
 
 function updateSolana() {
-  costOfSolana = randomNumFromInterval(150, 300).toString();
+  costOfSolana = randomNumFromInterval(150, 200).toString();
 }
 
 setInterval(updateSolana, 5 * 60 * 1000); // updates cost of solana every 5 minutes
