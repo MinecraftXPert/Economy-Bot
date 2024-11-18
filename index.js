@@ -28,7 +28,7 @@ const streamTimer = {};
 const date = new Date();
 const daysOfTheWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const currentDay = daysOfTheWeek[date.getDay()];
-let costOfSolana = randomNumFromInterval(150, 300).toString();
+let costOfSolana = randomNumFromInterval(150, 200).toString();
 
 // <:points:1102646967659659294>
 
