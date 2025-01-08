@@ -102,6 +102,14 @@ function updateSolana() {
   costOfSolana = randomNumFromInterval(150, 200).toString();
 }
 
+function commafy(num){
+  num = num.toString();
+    var pattern = /(-?\d+)(\d{3})/;
+    while (pattern.test(num))
+        num = num.replace(pattern, "$1,$2");
+    return num;
+}
+
 setInterval(updateSolana, 5 * 60 * 1000); // updates cost of solana every 5 minutes
 
 client.on("ready", async () => {
@@ -854,7 +862,7 @@ client.on("messageCreate", async (message) => {
               `${index + 1}. ${
                 member.user.username
               } - <:points:1102646967659659294> ${
-                storage[member.id].money + storage[member.id].bank
+                commafy(storage[member.id].money + storage[member.id].bank)
               }`
           )
           .join("\n")
@@ -862,39 +870,6 @@ client.on("messageCreate", async (message) => {
       .setTimestamp();
 
     message.channel.send({ embeds: [embed] });
-
-
-    const solanaLeaderboard = guildMembers
-      .sort((a, b) => {
-        const totalAmountA = storage[a.id].solana;
-        const totalAmountB = storage[b.id].solana;
-        return totalAmountB - totalAmountA;
-      })
-      .first(10); // Get the top 10 members based on their total amount
-
-    const solanaEmbed = new EmbedBuilder()
-      .setColor("Green")
-      .setAuthor({
-        name: `${message.author.username}`,
-        iconURL: `${message.author.displayAvatarURL()}`,
-        url: `https://discord.com/users/${message.author.id}`,
-      })
-      .setTitle(`Solana leaderboard for ${message.guild.name}`)
-      .setDescription(
-        leaderboard
-          .map(
-            (member, index) =>
-              `${index + 1}. ${
-                member.user.username
-              } - <:points:1102646967659659294> ${
-                storage[member.id].solana
-              }`
-          )
-          .join("\n")
-      )
-      .setTimestamp();
-
-    message.channel.send({ embeds: [solanaEmbed] });
   }
 
   if (command === "withdraw" || command === "with") {
