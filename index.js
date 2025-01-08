@@ -57,7 +57,6 @@ const cooldownTimes = {
   command2: 600000,
   command3: 604800000,
   command4: 300000,
-  command4: 2629800000,
 };
 
 const client = new Client({
