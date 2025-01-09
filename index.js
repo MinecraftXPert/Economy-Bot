@@ -26,8 +26,17 @@ const weeklyTimer = {};
 const fiveMinTimer = {};
 const begTimer = {};
 const streamTimer = {};
+const monthlyTimer = {};
 const date = new Date();
-const daysOfTheWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const daysOfTheWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 const currentDay = daysOfTheWeek[date.getDay()];
 let costOfSolana = randomNumFromInterval(150, 200).toString();
 
@@ -460,6 +469,58 @@ client.on("messageCreate", async (message) => {
     }
   }
 
+  if (command === "monthly") {
+    if (!storage[message.author.id].joined) {
+      message.channel.send(
+        `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
+      );
+      return;
+    }
+
+    const lastUsage = storage[message.author.id].lastMonthlyUsage || 0;
+    const now = Date.now();
+    const oneMonth = 30 * 24 * 60 * 60 * 1000; // Approximate one month in milliseconds
+
+    if (now - lastUsage >= oneMonth) {
+      // Run command logic...
+      const embed = new EmbedBuilder()
+        .setColor("Green")
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setTitle("Monthly Collect")
+        .setDescription(
+          "You have now collected your monthly allowance of <:points:1102646967659659294> 10000."
+        )
+        .setTimestamp();
+
+      storage[message.author.id].money += 10000;
+      storage[message.author.id].lastMonthlyUsage = now; // Update the last usage timestamp
+      message.channel.send({ embeds: [embed] });
+      save();
+    } else {
+      const timeRemaining = oneMonth - (now - lastUsage);
+      const daysRemaining = Math.floor(timeRemaining / (24 * 60 * 60 * 1000));
+      const hoursRemaining = Math.floor(
+        (timeRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)
+      );
+
+      const embed = new EmbedBuilder()
+        .setColor("Green")
+        .setDescription(
+          `This command is on cooldown. Please wait ${daysRemaining} day${
+            daysRemaining > 1 ? "s" : ""
+          } and ${hoursRemaining} hour${
+            hoursRemaining > 1 ? "s" : ""
+          } before trying again.`
+        )
+        .setTimestamp();
+      message.channel.send({ embeds: [embed] });
+    }
+  }
+
   if (command === "balance" || command === "bal") {
     if (!storage[message.author.id].joined) {
       message.channel.send(
@@ -581,7 +642,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**work**\nCollect money for work\n\n**beg**\nBeg for money\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**give (userID) (amount)**\nWill give a user of your choice a certain amount of your money **(currently not working)**\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)`
+        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**work**\nCollect money for work\n\n**beg**\nBeg for money\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)\n\n**give**\nWill allow you to give a certain amount of money to someone`
       )
       .setTimestamp();
 
@@ -1069,7 +1130,7 @@ client.on("messageCreate", async (message) => {
 
       message.channel.send({ embeds: [embed] });
     }
-  } 
+  }
 
   if (command === "remove") {
     if (!storage[message.author.id].joined) {
@@ -1136,25 +1197,30 @@ client.on("messageCreate", async (message) => {
       return;
     }
 
-
     let numSolana = parseInt(args[0]);
 
-    if(args[0] === "all"){
-      numSolana = Math.floor(storage[message.author.id].money/costOfSolana);
+    if (args[0] === "all") {
+      numSolana = Math.floor(storage[message.author.id].money / costOfSolana);
     }
 
     if (!numSolana) {
-      message.channel.send("Please specify \"all\" or the amount of Solana you want to buy");
+      message.channel.send(
+        'Please specify "all" or the amount of Solana you want to buy'
+      );
       return;
     }
 
     if (isNaN(numSolana) || numSolana < 1) {
-      message.channel.send("Please choose an actual number, a reasonable number, or \"all\"");
+      message.channel.send(
+        'Please choose an actual number, a reasonable number, or "all"'
+      );
       return;
     }
 
     if (storage[message.author.id].money < costOfSolana * numSolana) {
-      message.channel.send("You do not have enough money to buy that amount of Solana. Maybe try `$buy all`");
+      message.channel.send(
+        "You do not have enough money to buy that amount of Solana. Maybe try `$buy all`"
+      );
       return;
     }
 
@@ -1162,9 +1228,25 @@ client.on("messageCreate", async (message) => {
     storage[message.author.id].solana += numSolana;
     save();
 
-    if(args[0] === "all"){
-
+    if (args[0] === "all") {
       let embed = new EmbedBuilder()
+        .setColor("Green")
+        .setTitle("Buy")
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setDescription(
+          `You have successfully bought all the Solana you can afford.`
+        )
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] });
+      return;
+    }
+
+    let embed = new EmbedBuilder()
       .setColor("Green")
       .setTitle("Buy")
       .setAuthor({
@@ -1172,28 +1254,14 @@ client.on("messageCreate", async (message) => {
         iconURL: `${message.author.displayAvatarURL()}`,
         url: `https://discord.com/users/${message.author.id}`,
       })
-      .setDescription(`You have successfully bought all the Solana you can afford.`)
+      .setDescription(
+        `You have successfully bought ${numSolana} Solana for <:points:1102646967659659294> ${
+          costOfSolana * numSolana
+        }`
+      )
       .setTimestamp();
 
-      message.channel.send({ embeds: [embed]});
-      return;
-    
-    }
-
-
-    let embed = new EmbedBuilder()
-    .setColor("Green")
-    .setTitle("Buy")
-    .setAuthor({
-      name: `${message.author.username}`,
-      iconURL: `${message.author.displayAvatarURL()}`,
-      url: `https://discord.com/users/${message.author.id}`,
-    })
-    .setDescription(`You have successfully bought ${numSolana} Solana for <:points:1102646967659659294> ${costOfSolana * numSolana}`)
-    .setTimestamp();
-
     message.channel.send({ embeds: [embed] });
-   
   }
 
   if (command === "sell") {
@@ -1206,25 +1274,31 @@ client.on("messageCreate", async (message) => {
 
     let sellNumSolana = parseInt(args[0]);
 
-    if(args[0] === "all"){
+    if (args[0] === "all") {
       sellNumSolana = storage[message.author.id].solana;
     }
 
     if (!sellNumSolana && args[0] != "all") {
-      message.channel.send("Please specify \"all\" or the amount of Solana you want to sell");
+      message.channel.send(
+        'Please specify "all" or the amount of Solana you want to sell'
+      );
       return;
-    }else if(!sellNumSolana){
+    } else if (!sellNumSolana) {
       message.channel.send("You do not have any Solana to sell");
       return;
     }
 
     if (isNaN(sellNumSolana) || sellNumSolana < 1) {
-      message.channel.send("Please choose an actual number, a reasonable number, or \"all\"");
+      message.channel.send(
+        'Please choose an actual number, a reasonable number, or "all"'
+      );
       return;
     }
 
     if (storage[message.author.id].solana < sellNumSolana) {
-      message.channel.send("You do not have enough Solana to sell that amount. Maybe try `$sell all`");
+      message.channel.send(
+        "You do not have enough Solana to sell that amount. Maybe try `$sell all`"
+      );
       return;
     }
 
@@ -1232,8 +1306,28 @@ client.on("messageCreate", async (message) => {
     storage[message.author.id].solana -= sellNumSolana;
     save();
 
-    if(args[0] === "all"){
+    if (args[0] === "all") {
       let embed = new EmbedBuilder()
+        .setColor("Green")
+        .setTitle("Sell")
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setDescription(
+          `You have sold all of your Solana for <:points:1102646967659659294> ${
+            costOfSolana * sellNumSolana
+          }`
+        )
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] });
+
+      return;
+    }
+
+    let embed = new EmbedBuilder()
       .setColor("Green")
       .setTitle("Sell")
       .setAuthor({
@@ -1241,105 +1335,95 @@ client.on("messageCreate", async (message) => {
         iconURL: `${message.author.displayAvatarURL()}`,
         url: `https://discord.com/users/${message.author.id}`,
       })
-      .setDescription(`You have sold all of your Solana for <:points:1102646967659659294> ${costOfSolana * sellNumSolana}`)
+      .setDescription(
+        `You have sold ${sellNumSolana} Solana for <:points:1102646967659659294> ${
+          costOfSolana * sellNumSolana
+        }`
+      )
       .setTimestamp();
-
-      message.channel.send({ embeds:[embed]})
-
-      return;
-    }
-
-    let embed = new EmbedBuilder()
-    .setColor("Green")
-    .setTitle("Sell")
-    .setAuthor({
-      name: `${message.author.username}`,
-      iconURL: `${message.author.displayAvatarURL()}`,
-      url: `https://discord.com/users/${message.author.id}`,
-    })
-    .setDescription(`You have sold ${sellNumSolana} Solana for <:points:1102646967659659294> ${costOfSolana * sellNumSolana}`)
-    .setTimestamp();
 
     message.channel.send({ embeds: [embed] });
   }
 
   if (command === "cost") {
     const embed = new EmbedBuilder()
-    .setTitle("Cost of Solana")
-    .setColor("Green")
-    .setDescription(`The current cost of Solana is <:points:1102646967659659294> ${costOfSolana}`)
-    .setAuthor({
-      name: `${message.author.username}`,
-      iconURL: `${message.author.displayAvatarURL()}`,
-      url: `https://discord.com/users/${message.author.id}`,
-    })
-    .setTimestamp()
+      .setTitle("Cost of Solana")
+      .setColor("Green")
+      .setDescription(
+        `The current cost of Solana is <:points:1102646967659659294> ${costOfSolana}`
+      )
+      .setAuthor({
+        name: `${message.author.username}`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+        url: `https://discord.com/users/${message.author.id}`,
+      })
+      .setTimestamp();
 
     message.channel.send({ embeds: [embed] });
   }
 
-  if(command === "backup" && storage[message.author.id].contributor){
+  if (command === "give" || command === "donate") {
+    let recipientUser;
+    const userID = args[0];
+    const amount = parseInt(args[1]);
+
+    if (message.mentions.users.size > 0) {
+      recipientUser = message.mentions.users.first();
+    } else if (userID && client.users.cache.has(userID)) {
+      recipientUser = client.users.cache.get(userID);
+    } else {
+      message.channel.send("Please mention a user or provide their ID.");
+      return;
+    }
+
+    const recipientData = storage[recipientUser.id];
+    const senderData = storage[message.author.id];
+
+    if (!recipientData || !recipientData.joined) {
+      message.channel.send(
+        "The recipient has not joined yet, so you cannot give them any money."
+      );
+      return;
+    }
+
+    if (!amount || isNaN(amount) || amount <= 0) {
+      message.channel.send("Please specify a valid amount to give.");
+      return;
+    }
+
+    if (senderData.money < amount) {
+      message.channel.send("You do not have enough money to give.");
+      return;
+    }
+
+    recipientData.money += amount;
+    senderData.money -= amount;
+    save();
+
+    const embed = new EmbedBuilder()
+      .setColor("Green")
+      .setTitle("Give money")
+      .setAuthor({
+        name: `${message.author.username}`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+        url: `https://discord.com/users/${message.author.id}`,
+      })
+      .setDescription(
+        `You have successfully given <:points:1102646967659659294> ${amount} to ${recipientUser.username}.`
+      )
+      .setTimestamp();
+
+    message.channel.send({ embeds: [embed] });
+  }
+
+  // if (command === "shop") {
+  // }
+
+  if (command === "backup" && storage[message.author.id].contributor) {
     backup();
     message.channel.send("Data succesfully backed up to `./backup.json`");
     return;
   }
-
-  // if (command === "give" || command === "donate") {
-  //   let recipientUser;
-  //   const userID = args[0];
-  //   const amount = parseInt(args[1]);
-
-  //   if (message.mentions.users.size > 0) {
-  //     recipientUser = message.mentions.users.first();
-  //   } else if (userID && client.users.cache.has(userID)) {
-  //     recipientUser = client.users.cache.get(userID);
-  //   } else {
-  //     message.channel.send("Please mention a user or provide their ID.");
-  //     return;
-  //   }
-
-  //   const recipientData = storage[recipientUser.id];
-  //   const senderData = storage[message.author.id];
-
-  //   if (!recipientData || !recipientData.joined) {
-  //     message.channel.send(
-  //       "The recipient has not joined yet, so you cannot give them any money."
-  //     );
-  //     return;
-  //   }
-
-  //   if (!amount || isNaN(amount) || amount <= 0) {
-  //     message.channel.send("Please specify a valid amount to give.");
-  //     return;
-  //   }
-
-  //   if (senderData.money < amount) {
-  //     message.channel.send("You do not have enough money to give.");
-  //     return;
-  //   }
-
-  //   recipientData.money += amount;
-  //   senderData.money -= amount;
-  //   save();
-
-  //   const embed = new EmbedBuilder()
-  //     .setColor("Green")
-  //     .setTitle("Give money")
-  //     .setAuthor({
-  //       name: `${message.author.username}`,
-  //       iconURL: `${message.author.displayAvatarURL()}`,
-  //       url: `https://discord.com/users/${message.author.id}`,
-  //     })
-  //     .setDescription(
-  //       `You have successfully given <:points:1102646967659659294> ${amount} to ${recipientUser.username}.`
-  //     )
-  //     .setTimestamp();
-
-  //   message.channel.send({ embeds: [embed] });
-  // }
-
-  // if (command === "shop") {
-  // }
 });
 
 client.login(TOKEN);
