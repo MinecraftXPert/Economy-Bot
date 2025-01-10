@@ -634,7 +634,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**work**\nCollect money for work\n\n**beg**\nBeg for money\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)\n\n**give**\nWill allow you to give a certain amount of money to someone`
+        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**work**\nCollect money for work\n\n**beg**\nBeg for money\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)\n\n**give**\nWill allow you to give a certain amount of money to someone\n\n**bet (amount) (heads or tails)**\nWill allow you to bet either heads or tails (the max bet is $10,000).`
       )
       .setTimestamp();
 
@@ -1406,6 +1406,69 @@ client.on("messageCreate", async (message) => {
       .setTimestamp();
 
     message.channel.send({ embeds: [embed] });
+  }
+
+  if (command === "bet") {
+    if (!storage[message.author.id].joined) {
+      message.channel.send(
+        `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
+      );
+      return;
+    }
+
+    const coinFlip = Math.random() > 0.5 ? "heads" : "tails";
+
+    const betAmount = parseInt(args[0]);
+    const bet = args[1];
+
+    if (!betAmount || betAmount > 10000) {
+      return message.channel.send("You must put in a valid amount to bet");
+    }
+
+    if (!bet) {
+      return message.channel.send("You must either bet heads or tails");
+    }
+
+    if (betAmount > storage[message.author.id].money) {
+      return message.channel.send("You do not have that much money to bet");
+    }
+
+    storage[message.author.id].money -= betAmount;
+    save();
+
+    if (bet === coinFlip) {
+      const embed = new EmbedBuilder()
+        .setColor("Green")
+        .setTitle("Win money")
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setDescription(
+          `Congrats! You bet ${bet} and the coin landed on ${coinFlip} so you won!`
+        )
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] });
+      storage[message.author.id].money += betAmount * 2;
+      save();
+    } else {
+      const embed = new EmbedBuilder()
+        .setColor("Red")
+        .setTitle("Win money")
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setDescription(
+          `Oof. You bet ${bet} and the coin landed on ${coinFlip} so you lost your money. Better luck next time.`
+        )
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] });
+    }
   }
 
   // if (command === "shop") {
