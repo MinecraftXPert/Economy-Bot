@@ -1,0 +1,68 @@
+{
+    "unemployed":{
+        "name":null,
+        "pay":null,
+        "rejectionRate":0,
+        "beg":true
+    },
+    "fastfood":{
+        "name":"Fast food worker",
+        "pay":11.25,
+        "rejectionRate":0.05,
+        "beg":true
+    },
+    "garbageman":{
+        "name":"Garbage collector",
+        "pay":20,
+        "rejectionRate":0.08,
+        "beg":true
+    },
+    "constructionworkergov":{
+        "name":"Government construction worker",
+        "pay":22,
+        "rejectionRate":0.09,
+        "beg":true
+    },
+    "teacher":{
+        "name":"Teacher",
+        "pay":25,
+        "rejectionRate":0.1,
+        "beg":true
+    },
+    "mechanic":{
+        "name":"Mechanic",
+        "pay":30,
+        "rejectionRate":0.10,
+        "beg":true
+    },
+    "lawenforcment":{
+        "name":"Police officer",
+        "pay":32,
+        "rejectionRate":0.13,
+        "beg":true
+    },
+    "emt":{
+        "name":"EMT",
+        "pay":33,
+        "rejectionRate":0.14,
+        "beg":true
+    },
+    "truckdriver":{
+        "name":"Truck driver",
+        "pay":35,
+        "rejectionRate":0.15,
+        "beg":true
+    },
+    "independantcontractor":{
+        "name":"Independent contractor",
+        "pay":40,
+        "rejectionRate":0.18,
+        "beg":true
+    },
+    "lawyer":{
+        "name":"lawyer",
+        "pay":43,
+        "rejectionRate":0.2,
+        "beg":true
+    }
+}

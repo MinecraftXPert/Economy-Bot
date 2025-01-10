@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+{"592825756095348748":{"joined":true,"money":5000000,"bank":0,"solana":0,"serverId":"624700321423425536","contributor":true},"1089987702516088853":{"joined":true,"money":5000000000,"bank":0,"solana":0,"serverId":"1126189738269872219","contributor":true}}
+=======
 {
   "1089987702516088853": {
     "joined": true,
@@ -63,3 +66,4 @@
     "serverId": "1307808942184726619"
   }
 }
+>>>>>>> bc2d1bdef25ace6d2ac45566e4085b80add3f30f

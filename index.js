@@ -111,6 +111,14 @@ function updateSolana() {
   costOfSolana = randomNumFromInterval(150, 200).toString();
 }
 
+function commafy(num){
+  num = num.toString();
+    var pattern = /(-?\d+)(\d{3})/;
+    while (pattern.test(num))
+        num = num.replace(pattern, "$1,$2");
+    return num;
+}
+
 setInterval(updateSolana, 5 * 60 * 1000); // updates cost of solana every 5 minutes
 
 client.on("ready", async () => {
@@ -540,26 +548,26 @@ client.on("messageCreate", async (message) => {
           {
             name: "**Bank**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].bank
+              commafy(storage[message.author.id].bank)
             }**`,
             inline: true,
           },
           {
             name: "**Cash**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].money
+              commafy(storage[message.author.id].money)
             }**`,
             inline: true,
           },
           {
             name: "**Total**",
-            value: `**<:points:1102646967659659294> ${totalMoney}**`,
+            value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
             inline: true,
           },
           {
             name: "**Solana**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].solana
+              commafy(storage[message.author.id].solana)
             }**`,
             inline: true,
           }
@@ -601,21 +609,28 @@ client.on("messageCreate", async (message) => {
         iconURL: `${targetUser.displayAvatarURL()}`,
         url: `https://discord.com/users/${targetUser.id}`,
       })
-      .setDescription(`Here is the balance for ${targetUser.username}`)
+      .setDescription(`Here is the balance for ${commafy(targetUser.username)}`)
       .addFields(
         {
           name: "**Bank**",
-          value: `**<:points:1102646967659659294> ${targetStorage.bank}**`,
+          value: `**<:points:1102646967659659294> ${commafy(targetStorage.bank)}**`,
           inline: true,
         },
         {
           name: "**Cash**",
-          value: `**<:points:1102646967659659294> ${targetStorage.money}**`,
+          value: `**<:points:1102646967659659294> ${commafy(targetStorage.money)}**`,
           inline: true,
         },
         {
           name: "**Total**",
-          value: `**<:points:1102646967659659294> ${totalMoney}**`,
+          value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
+          inline: true,
+        },
+        {
+          name: "**Solana**",
+          value: `**<:points:1102646967659659294> ${
+            commafy(targetStorage.solana)
+          }**`,
           inline: true,
         }
       )
@@ -915,7 +930,7 @@ client.on("messageCreate", async (message) => {
               `${index + 1}. ${
                 member.user.username
               } - <:points:1102646967659659294> ${
-                storage[member.id].money + storage[member.id].bank
+                commafy(storage[member.id].money + storage[member.id].bank)
               }`
           )
           .join("\n")
@@ -986,7 +1001,7 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have successfully withdrawn <:points:1102646967659659294> ${amountNumber} out of your bank account`
+          `You have successfully withdrawn <:points:1102646967659659294> ${commafy(amountNumber)} out of your bank account`
         )
         .setTimestamp();
 
@@ -1057,7 +1072,7 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have successfully deposited <:points:1102646967659659294> ${amountNumber} `
+          `You have successfully deposited <:points:1102646967659659294> ${commafy(amountNumber)} `
         )
         .setTimestamp();
 
@@ -1116,7 +1131,7 @@ client.on("messageCreate", async (message) => {
         .setColor("Green")
         .setTitle("Added Money")
         .setDescription(
-          `Added <:points:1102646967659659294> ${amount} to ${recipientUser.username}'s bank account.`
+          `Added <:points:1102646967659659294> ${commafy(amount)} to ${recipientUser.username}'s bank account.`
         )
         .setTimestamp();
 
@@ -1173,7 +1188,7 @@ client.on("messageCreate", async (message) => {
         .setColor("Green")
         .setTitle("Removed Money")
         .setDescription(
-          `Removed <:points:1102646967659659294> ${amount} to ${recipientUser.username}'s bank account.`
+          `Removed <:points:1102646967659659294> ${commafy(amount)} to ${recipientUser.username}'s bank account.`
         )
         .setTimestamp();
 
@@ -1247,7 +1262,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `You have successfully bought ${numSolana} Solana for <:points:1102646967659659294> ${
+        `You have successfully bought ${commafy(numSolana)} Solana for <:points:1102646967659659294> ${
           costOfSolana * numSolana
         }`
       )
@@ -1309,7 +1324,7 @@ client.on("messageCreate", async (message) => {
         })
         .setDescription(
           `You have sold all of your Solana for <:points:1102646967659659294> ${
-            costOfSolana * sellNumSolana
+            commafy(costOfSolana * sellNumSolana)
           }`
         )
         .setTimestamp();
@@ -1401,7 +1416,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `You have successfully given <:points:1102646967659659294> ${amount} to ${recipientUser.username}.`
+        `You have successfully given <:points:1102646967659659294> ${commafy(amount)} to ${recipientUser.username}.`
       )
       .setTimestamp();
 
