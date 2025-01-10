@@ -548,26 +548,26 @@ client.on("messageCreate", async (message) => {
           {
             name: "**Bank**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].bank
+              commafy(storage[message.author.id].bank)
             }**`,
             inline: true,
           },
           {
             name: "**Cash**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].money
+              commafy(storage[message.author.id].money)
             }**`,
             inline: true,
           },
           {
             name: "**Total**",
-            value: `**<:points:1102646967659659294> ${totalMoney}**`,
+            value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
             inline: true,
           },
           {
             name: "**Solana**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].solana
+              commafy(storage[message.author.id].solana)
             }**`,
             inline: true,
           }
@@ -609,21 +609,28 @@ client.on("messageCreate", async (message) => {
         iconURL: `${targetUser.displayAvatarURL()}`,
         url: `https://discord.com/users/${targetUser.id}`,
       })
-      .setDescription(`Here is the balance for ${targetUser.username}`)
+      .setDescription(`Here is the balance for ${commafy(targetUser.username)}`)
       .addFields(
         {
           name: "**Bank**",
-          value: `**<:points:1102646967659659294> ${targetStorage.bank}**`,
+          value: `**<:points:1102646967659659294> ${commafy(targetStorage.bank)}**`,
           inline: true,
         },
         {
           name: "**Cash**",
-          value: `**<:points:1102646967659659294> ${targetStorage.money}**`,
+          value: `**<:points:1102646967659659294> ${commafy(targetStorage.money)}**`,
           inline: true,
         },
         {
           name: "**Total**",
-          value: `**<:points:1102646967659659294> ${totalMoney}**`,
+          value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
+          inline: true,
+        },
+        {
+          name: "**Solana**",
+          value: `**<:points:1102646967659659294> ${
+            commafy(targetStorage.solana)
+          }**`,
           inline: true,
         }
       )
