@@ -1436,7 +1436,7 @@ client.on("messageCreate", async (message) => {
     const betAmount = parseInt(args[0]);
     const bet = args[1];
 
-    if (!betAmount || betAmount > 10000) {
+    if (!betAmount || betAmount > 10000 || betAmount < 0) {
       return message.channel.send("You must put in a valid amount to bet");
     }
 
@@ -1471,7 +1471,7 @@ client.on("messageCreate", async (message) => {
     } else {
       const embed = new EmbedBuilder()
         .setColor("Red")
-        .setTitle("Win money")
+        .setTitle("Lost money")
         .setAuthor({
           name: `${message.author.username}`,
           iconURL: `${message.author.displayAvatarURL()}`,
