@@ -140,6 +140,18 @@ client.on("ready", async () => {
   });
 });
 
+//welcome message
+client.on('guildMemberAdd', member => {
+  let welcomeMessage = `Welcome ${member.user.globalName}!\nHead on over to <#1307873159780765797> and say \`${prefix}help\` to get started!`;
+  if(member.guild.id!='1307808942184726619')return;
+
+  client.channels.fetch('1307808942625263639').then((chan)=>{
+    chan.send(welcomeMessage);
+  }).catch((err)=>{
+    console.log(err);
+  });
+});
+
 // Define a constant for the minimum and maximum amounts of money that can be won or lost
 const MIN_CRIME_AMOUNT = -100;
 const MAX_CRIME_AMOUNT = 100;
