@@ -92,6 +92,14 @@ client.on("guildCreate", async (guild) => {
   } catch (error) {
     console.error("Failed to send server invite information:", error);
   }
+
+  try{
+    client.channels.fetch(guild.systemChannelId).then((channel)=>{
+      channel.send(`Thanks for inviting me to this server!\nuse \`${prefix}help\` to start`);
+    });
+  }catch(err){
+    console.error(err);
+  }
 });
 
 function save() {
