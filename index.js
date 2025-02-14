@@ -15,11 +15,7 @@ require("dotenv").config();
 const TOKEN = process.env.DISCORD_TOKEN;
 const { ActivityType } = require("discord.js");
 
-const JOE = "682984131176431786";
-
-// test again
-
-const prefix = "$";
+const prefix = "!";
 const timer = {};
 const crimeTimer = {};
 const weeklyTimer = {};
@@ -111,14 +107,6 @@ function updateSolana() {
   costOfSolana = randomNumFromInterval(150, 200).toString();
 }
 
-function commafy(num){
-  num = num.toString();
-    var pattern = /(-?\d+)(\d{3})/;
-    while (pattern.test(num))
-        num = num.replace(pattern, "$1,$2");
-    return num;
-}
-
 setInterval(updateSolana, 5 * 60 * 1000); // updates cost of solana every 5 minutes
 
 client.on("ready", async () => {
@@ -139,6 +127,130 @@ client.on("ready", async () => {
     ],
   });
 });
+
+const jobs = [
+  {
+    title: "Street cleaner",
+    description: "Sweep streets and collects trash",
+    income: 100,
+    level: 1,
+  },
+  {
+    title: "Cashier",
+    description: "Handle transactions and assist customers.",
+    income: 100,
+    level: 1,
+  },
+  {
+    title: "Barista",
+    description: "Prepare and serve coffee.",
+    income: 100,
+    level: 1,
+  },
+  {
+    title: "Retail Associate",
+    description: "Assist customers and restock shelves.",
+    income: 100,
+    level: 1,
+  },
+  {
+    title: "Delivery Driver",
+    description: "Deliver packages to customers.",
+    income: 100,
+    level: 1,
+  },
+  {
+    title: "Customer Service Representative",
+    description: "Assist customers with inquiries.",
+    income: 120,
+    level: 2,
+  },
+  {
+    title: "Discord Mod",
+    description: "Get fat and don't ever touch grass.",
+    income: 120,
+    level: 2,
+  },
+  {
+    title: "Administrative Assistant",
+    description: "Perform clerical tasks and support office operations.",
+    income: 150,
+    level: 3,
+  },
+  {
+    title: "Sales Associate",
+    description: "Promote products and achieve sales targets.",
+    income: 150,
+    level: 3,
+  },
+  {
+    title: "Warehouse Worker",
+    description: "Handle inventory and pack orders.",
+    income: 150,
+    level: 3,
+  },
+  {
+    title: "Receptionist",
+    description: "Greet visitors and manage front desk.",
+    income: 150,
+    level: 3,
+  },
+  {
+    title: "Data Entry Clerk",
+    description: "Input and update data.",
+    income: 175,
+    level: 4,
+  },
+  {
+    title: "Security Guard",
+    description: "Protect property and individuals.",
+    income: 175,
+    level: 4,
+  },
+  {
+    title: "Technical Support Specialist",
+    description: "Provide technical assistance.",
+    income: 175,
+    level: 4,
+  },
+  {
+    title: "Marketing Coordinator",
+    description: "Assist in marketing campaigns.",
+    income: 200,
+    level: 5,
+  },
+  {
+    title: "Software Developer",
+    description: "Develop and maintain software.",
+    income: 200,
+    level: 5,
+  },
+  {
+    title: "Project Manager",
+    description: "Oversee and manage projects.",
+    income: 200,
+    level: 5,
+  },
+  {
+    title: "Data Scientist",
+    description: "Analyze and interpret data.",
+    income: 200,
+    level: 5,
+  },
+  {
+    title: "Lawyer",
+    description: "Send ppl to jail.",
+    income: 500,
+    level: 6,
+  },
+  { title: "Doctor", description: "Fix ppl.", income: 500, level: 6 },
+  {
+    title: "CEO of Discord",
+    description: "Make lots of money while not touching grass.",
+    income: 1000,
+    level: 7,
+  },
+];
 
 // Define a constant for the minimum and maximum amounts of money that can be won or lost
 const MIN_CRIME_AMOUNT = -100;
@@ -173,28 +285,7 @@ client.on("messageCreate", async (message) => {
     };
   }
 
-  // COMMANDDS
-
-  /*
-      TO DO:
-
-      - Ping command        | Done
-      - Join command        | Done
-      - Collect command     | Done
-      - Crime command       | Done
-      - Weekly command      | Done
-      - Balance command     | Done
-      - Help commmand       | Done
-      - Withdraw command    | Done
-      - Deposit command     | Done
-      - Work command        | Done
-      - Stream command      | Done
-      - Leaderboard command | Done
-      - Beg command         | Done
-      - Give command        | Done
-      - Shop command        | Not done
-
-  */
+  // COMMANDS
 
   if (command === "ping") {
     const timeTaken = Date.now() - message.createdTimestamp;
@@ -234,6 +325,10 @@ client.on("messageCreate", async (message) => {
     storage[message.author.id].money += 500;
     storage[message.author.id].bank = 0;
     storage[message.author.id].solana = 0;
+    storage[message.author.id].hasJob = false;
+    storage[message.author.id].numJobsCanApply = 5;
+    // here for filtering out the all the other jobs when someone tries to apply because obviously they're gonna be at level one when first joining
+    storage[message.author.id].jobLevel = 1;
 
     // Add the server ID to the user object in storage.json
     storage[message.author.id].serverId = serverId;
@@ -548,26 +643,26 @@ client.on("messageCreate", async (message) => {
           {
             name: "**Bank**",
             value: `**<:points:1102646967659659294> ${
-              commafy(storage[message.author.id].bank)
+              storage[message.author.id].bank
             }**`,
             inline: true,
           },
           {
             name: "**Cash**",
             value: `**<:points:1102646967659659294> ${
-              commafy(storage[message.author.id].money)
+              storage[message.author.id].money
             }**`,
             inline: true,
           },
           {
             name: "**Total**",
-            value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
+            value: `**<:points:1102646967659659294> ${totalMoney}**`,
             inline: true,
           },
           {
             name: "**Solana**",
             value: `**<:points:1102646967659659294> ${
-              commafy(storage[message.author.id].solana)
+              storage[message.author.id].solana
             }**`,
             inline: true,
           }
@@ -609,28 +704,21 @@ client.on("messageCreate", async (message) => {
         iconURL: `${targetUser.displayAvatarURL()}`,
         url: `https://discord.com/users/${targetUser.id}`,
       })
-      .setDescription(`Here is the balance for ${commafy(targetUser.username)}`)
+      .setDescription(`Here is the balance for ${targetUser.username}`)
       .addFields(
         {
           name: "**Bank**",
-          value: `**<:points:1102646967659659294> ${commafy(targetStorage.bank)}**`,
+          value: `**<:points:1102646967659659294> ${targetStorage.bank}**`,
           inline: true,
         },
         {
           name: "**Cash**",
-          value: `**<:points:1102646967659659294> ${commafy(targetStorage.money)}**`,
+          value: `**<:points:1102646967659659294> ${targetStorage.money}**`,
           inline: true,
         },
         {
           name: "**Total**",
-          value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
-          inline: true,
-        },
-        {
-          name: "**Solana**",
-          value: `**<:points:1102646967659659294> ${
-            commafy(targetStorage.solana)
-          }**`,
+          value: `**<:points:1102646967659659294> ${totalMoney}**`,
           inline: true,
         }
       )
@@ -649,8 +737,121 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**work**\nCollect money for work\n\n**beg**\nBeg for money\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)\n\n**give**\nWill allow you to give a certain amount of money to someone\n\n**bet (amount) (heads or tails)**\nWill allow you to bet either heads or tails (the max bet is $10,000).`
+        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**list (optional: desc)**\nWill give the list of jobs you can apply for and their income\n\n**beg**\nBeg for money\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)\n\n**give**\nWill allow you to give a certain amount of money to someone`
       )
+      .setTimestamp();
+
+    message.channel.send({ embeds: [embed] });
+  }
+
+  if (command === "apply") {
+    if (!storage[message.author.id].joined) {
+      message.channel.send(
+        `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
+      );
+      return;
+    }
+
+    if (storage[message.author.id].hasJob) {
+      message.channel.send(
+        `Looks like you already have a job as a ${
+          storage[message.author.id].job
+        }. If you would like a new job, please use the \`${prefix}resign\` command to resign your position and get a new job.`
+      );
+      return;
+    }
+
+    const jobPick = parseInt(args[0]);
+
+    if (!jobPick) {
+      // filters through the jobs at your level. For example, if your level is 2, then it'll show you levels 1 and 2 for the jobs array and so on
+      let jobsList = jobs
+        .filter((job) => job.level <= storage[message.author.id].jobLevel)
+        .map((job, i) => {
+          return {
+            name: `${i + 1}) Title: ${job.title}`,
+            value: `**Income:** <:points:1102646967659659294> \`${job.income}\``,
+          };
+        });
+
+      const embed = new EmbedBuilder()
+        .setColor("Green")
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setTitle("Job Application")
+        .setDescription(
+          `Here are the list of jobs available. If you're just starting out then you can only apply for certain jobs. Once you work more then you can get better jobs. Please choose which job you want to apply for by doing \`${prefix}apply (job number)\`. **For example, if you want to be a cashier, it would be \`${prefix}apply 2\`.**`
+        )
+        .addFields(jobsList)
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] });
+      return;
+    } else {
+      if (jobPick <= 0 || isNaN(jobPick)) {
+        return message.channel.send("You must pick a valid job.");
+      }
+      if (jobPick > storage[message.author.id].numJobsCanApply) {
+        return message.channel.send(
+          "You can only apply for the jobs listed until you move up in the ranks."
+        );
+      }
+      storage[message.author.id].job = jobs[jobPick - 1].title;
+      storage[message.author.id].hasJob = true;
+      storage[message.author.id].income = jobs[jobPick - 1].income;
+      const embed = new EmbedBuilder()
+        .setColor("Green")
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setTitle("Applied Success")
+        .setDescription(
+          `You have successfully applied for the job as a ${
+            storage[message.author.id].job
+          }! You will now have an income of <:points:1102646967659659294> ${
+            storage[message.author.id].income
+          } until you start moving up the ranks.`
+        )
+        .setTimestamp();
+
+      message.channel.send({ embeds: [embed] });
+      // placed down here so you can actually keep your progress
+      if (storage[message.author.id].numTimesWorked > 0) {
+        return;
+      } else {
+        storage[message.author.id].numTimesWorked = 0;
+      }
+      save();
+    }
+  }
+
+  if (command === "resign") {
+    if (!storage[message.author.id].joined) {
+      message.channel.send(
+        `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
+      );
+      return;
+    }
+
+    storage[message.author.id].hasJob = false;
+    delete storage[message.author.id].job;
+    delete storage[message.author.id].income;
+
+    save();
+    const embed = new EmbedBuilder()
+      .setColor("Red")
+      .setAuthor({
+        name: `${message.author.username}`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+        url: `https://discord.com/users/${message.author.id}`,
+      })
+      .setTitle("Resign Success")
+      .setDescription(`You have resigned your position.`)
       .setTimestamp();
 
     message.channel.send({ embeds: [embed] });
@@ -664,82 +865,138 @@ client.on("messageCreate", async (message) => {
       return;
     }
 
-    if (!fiveMinTimer[message.author.id]) {
-      // If the user does not have a fiveMinTimer entry, create one
-      fiveMinTimer[message.author.id] = Date.now();
+    if (!storage[message.author.id].hasJob) {
+      return message.channel.send(
+        `It looks you don't have a job so you can't use this command. Use the \`${prefix}apply\` command to get a job.`
+      );
+    }
 
-      // Run command logic...
-      const workMessages = [
-        "You worked hard today and earned",
-        "Your boss was impressed with your work and gave you a bonus of",
-        "You worked overtime and earned an additional",
-        "Your hard work and dedication have paid off with a salary increase of",
-        "You worked as a construction worker and earned",
-        "You worked as a waiter/waitress and earned",
-        "You worked as a retail sales associate and earned",
-        "You worked as a freelance writer and earned",
-        "You worked as a software developer and earned",
-        "You worked as a teacher and earned",
-        "You worked as a plumber and earned",
-        "You worked as a chef and earned",
-        "You worked as a landscaper and earned",
-        "You worked as a customer service representative and earned",
-        "You worked as a delivery driver and earned",
-        "You worked as a data analyst and earned",
-        "You worked as a security guard and earned",
-        "You worked as a marketing specialist and earned",
-        "You worked as a hair stylist and earned",
-        "You worked as a mechanic and earned",
-        "You worked as a social media manager and earned",
-        "You worked as a financial advisor and earned",
-      ];
+    const embed2 = new EmbedBuilder()
+      .setColor("Green")
+      .setTitle("Promotion")
+      .setDescription(
+        "Your boss was impressed and gave you a promotion! You can now apply for better jobs."
+      )
+      .setAuthor({
+        name: `${message.author.username}`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+        url: `https://discord.com/users/${message.author.id}`,
+      })
+      .setTimestamp();
 
-      const workAmount = randomNumFromInterval(50, 150);
-      storage[message.author.id].money += workAmount;
-      save();
+    switch (storage[message.author.id].numTimesWorked) {
+      case 20:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 2;
+        storage[message.author.id].jobLevel++;
+        break;
+      case 50:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 4;
+        storage[message.author.id].jobLevel++;
+        break;
+      case 80:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 3;
+        storage[message.author.id].jobLevel++;
+        break;
+      case 140:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 4;
+        storage[message.author.id].jobLevel++;
+        break;
+      case 200:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 1;
+        storage[message.author.id].jobLevel++;
+        break;
+      case 300:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 1;
+        storage[message.author.id].jobLevel++;
+        break;
+    }
 
-      const randomMesssage = randomNumFromInterval(0, workMessages.length - 1);
+    const embed = new EmbedBuilder()
+      .setColor("Green")
+      .setTitle("Worked Shift")
+      .setDescription(
+        `You worked as a ${
+          storage[message.author.id].job
+        } and earned <:points:1102646967659659294> ${
+          storage[message.author.id].income
+        }`
+      )
+      .setAuthor({
+        name: `${message.author.username}`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+        url: `https://discord.com/users/${message.author.id}`,
+      })
+      .setTimestamp();
+    message.channel.send({ embeds: [embed] });
+    storage[message.author.id].numTimesWorked++;
+    storage[message.author.id].money += storage[message.author.id].income;
+    save();
+  }
+
+  if (command === "list") {
+    if (!storage[message.author.id].joined) {
+      message.channel.send(
+        `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
+      );
+      return;
+    }
+
+    const arg1 = args[0];
+
+    if (arg1 === "desc" || arg1 === "description") {
+      let jobsDescriptions = jobs.map((job) => {
+        return {
+          name: `Title: ${job.title}`,
+          value: `**Description:** ${job.description}`,
+        };
+      });
+
       const embed = new EmbedBuilder()
         .setColor("Green")
-        .setTitle("Work")
         .setAuthor({
           name: `${message.author.username}`,
           iconURL: `${message.author.displayAvatarURL()}`,
           url: `https://discord.com/users/${message.author.id}`,
         })
+        .setTitle("Job Descriptions")
         .setDescription(
-          `${workMessages[randomMesssage]} <:points:1102646967659659294> ${workAmount}`
+          `Here are the list of jobs available and the description. If you're just starting out then you can only apply for certain jobs. Once you work more then you can get better jobs.`
         )
+        .addFields(jobsDescriptions)
         .setTimestamp();
 
       message.channel.send({ embeds: [embed] });
-
-      // Set the fiveMinTimer to expire in 5 minutes
-      setTimeout(() => {
-        delete fiveMinTimer[message.author.id];
-      }, cooldownTimes.command4);
-    } else {
-      // If the user has a fiveMinTimer entry, check how much time has passed since the last usage
-      let timeSinceLastUsage = Date.now() - fiveMinTimer[message.author.id];
-      // If less than 10 minutes have passed, send a message saying the command is on cooldown
-      if (timeSinceLastUsage < cooldownTimes.command4) {
-        let timeRemaining =
-          (cooldownTimes.command4 - timeSinceLastUsage) / 60000;
-        const embed = new EmbedBuilder()
-          .setColor("Green")
-          .setDescription(
-            `This command is on cooldown. Please wait ${timeRemaining.toFixed(
-              0
-            )} more minutes before trying again.`
-          )
-          .setTimestamp();
-        message.channel.send({ embeds: [embed] });
-      } else {
-        // If 10 minutes or more have passed, delete the timer entry and run the command logic
-        delete fiveMinTimer[message.author.id];
-        // ...
-      }
+      return;
     }
+
+    let jobsList = jobs.map((job) => {
+      return {
+        name: `Title: ${job.title}`,
+        value: `**Income:** <:points:1102646967659659294> \`${job.income}\``,
+      };
+    });
+
+    const embed = new EmbedBuilder()
+      .setColor("Green")
+      .setAuthor({
+        name: `${message.author.username}`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+        url: `https://discord.com/users/${message.author.id}`,
+      })
+      .setTitle("Job list")
+      .setDescription(
+        `Here are the list of jobs available. If you're just starting out then you can only apply for certain jobs. Once you work more then you can get better jobs.`
+      )
+      .addFields(jobsList)
+      .setTimestamp();
+
+    message.channel.send({ embeds: [embed] });
   }
 
   if (command === "beg") {
@@ -930,7 +1187,7 @@ client.on("messageCreate", async (message) => {
               `${index + 1}. ${
                 member.user.username
               } - <:points:1102646967659659294> ${
-                commafy(storage[member.id].money + storage[member.id].bank)
+                storage[member.id].money + storage[member.id].bank
               }`
           )
           .join("\n")
@@ -1001,7 +1258,7 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have successfully withdrawn <:points:1102646967659659294> ${commafy(amountNumber)} out of your bank account`
+          `You have successfully withdrawn <:points:1102646967659659294> ${amountNumber} out of your bank account`
         )
         .setTimestamp();
 
@@ -1072,7 +1329,7 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have successfully deposited <:points:1102646967659659294> ${commafy(amountNumber)} `
+          `You have successfully deposited <:points:1102646967659659294> ${amountNumber} `
         )
         .setTimestamp();
 
@@ -1080,120 +1337,6 @@ client.on("messageCreate", async (message) => {
     }
 
     save();
-  }
-
-  if (command === "add") {
-    if (!storage[message.author.id].joined) {
-      message.channel.send(`Lol nice try bud`);
-      return;
-    }
-
-    if (message.author.id != JOE) {
-      message.channel.send("Nice try bud. That's not gonna work here :)");
-      return;
-    } else {
-      let recipientUser;
-      const userId = args[0];
-      const amount = parseInt(args[1]);
-
-      if (message.mentions.users.size > 0) {
-        recipientUser = message.mentions.users.first();
-      } else if (userId && client.users.cache.has(userId)) {
-        recipientUser = client.users.cache.get(userId);
-      } else {
-        message.channel.send("Please mention a user or provide their ID.");
-        return;
-      }
-
-      // const member = client.members.cache.get(message.author.id);
-
-      if (!storage[userId].joined) {
-        message.channel.send(
-          `Whoops! Looks like this user needs to join first! Tell them to use the \`${prefix}join\` command to join in and get started!`
-        );
-        return;
-      }
-
-      if (!userId) {
-        message.channel.send("Please specify the id");
-        return;
-      }
-
-      if (!amount) {
-        message.channel.send("Please specify the amount");
-        return;
-      }
-
-      storage[userId].money += amount;
-      save();
-
-      const embed = new EmbedBuilder()
-        .setColor("Green")
-        .setTitle("Added Money")
-        .setDescription(
-          `Added <:points:1102646967659659294> ${commafy(amount)} to ${recipientUser.username}'s bank account.`
-        )
-        .setTimestamp();
-
-      message.channel.send({ embeds: [embed] });
-    }
-  }
-
-  if (command === "remove") {
-    if (!storage[message.author.id].joined) {
-      message.channel.send(`Lol nice try bud. Not gonna happen :)`);
-      return;
-    }
-
-    if (message.author.id != JOE) {
-      message.channel.send("Nice try bud. That's not gonna happen here :)");
-      return;
-    } else {
-      let recipientUser;
-      const userId = args[0];
-      const amount = parseInt(args[1]);
-
-      if (message.mentions.users.size > 0) {
-        recipientUser = message.mentions.users.first();
-      } else if (userId && client.users.cache.has(userId)) {
-        recipientUser = client.users.cache.get(userId);
-      } else {
-        message.channel.send("Please mention a user or provide their ID.");
-        return;
-      }
-
-      // const member = client.members.cache.get(message.author.id);
-
-      if (!storage[userId].joined) {
-        message.channel.send(
-          `Whoops! Looks like this user needs to join first! Tell them to use the \`${prefix}join\` command to join in and get started!`
-        );
-        return;
-      }
-
-      if (!userId) {
-        message.channel.send("Please specify the id");
-        return;
-      }
-
-      if (!amount) {
-        message.channel.send("Please specify the amount");
-        return;
-      }
-
-      storage[userId].money -= amount;
-      save();
-
-      const embed = new EmbedBuilder()
-        .setColor("Green")
-        .setTitle("Removed Money")
-        .setDescription(
-          `Removed <:points:1102646967659659294> ${commafy(amount)} to ${recipientUser.username}'s bank account.`
-        )
-        .setTimestamp();
-
-      message.channel.send({ embeds: [embed] });
-    }
   }
 
   if (command === "buy") {
@@ -1226,7 +1369,7 @@ client.on("messageCreate", async (message) => {
 
     if (storage[message.author.id].money < costOfSolana * numSolana) {
       message.channel.send(
-        "You do not have enough money to buy that amount of Solana. Maybe try `$buy all`"
+        "You do not have enough money to buy that amount of Solana."
       );
       return;
     }
@@ -1262,7 +1405,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `You have successfully bought ${commafy(numSolana)} Solana for <:points:1102646967659659294> ${
+        `You have successfully bought ${numSolana} Solana for <:points:1102646967659659294> ${
           costOfSolana * numSolana
         }`
       )
@@ -1324,7 +1467,7 @@ client.on("messageCreate", async (message) => {
         })
         .setDescription(
           `You have sold all of your Solana for <:points:1102646967659659294> ${
-            commafy(costOfSolana * sellNumSolana)
+            costOfSolana * sellNumSolana
           }`
         )
         .setTimestamp();
@@ -1370,6 +1513,13 @@ client.on("messageCreate", async (message) => {
   }
 
   if (command === "give" || command === "donate") {
+    if (!storage[message.author.id].joined) {
+      message.channel.send(
+        `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
+      );
+      return;
+    }
+
     let recipientUser;
     const userID = args[0];
     const amount = parseInt(args[1]);
@@ -1416,7 +1566,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `You have successfully given <:points:1102646967659659294> ${commafy(amount)} to ${recipientUser.username}.`
+        `You have successfully given <:points:1102646967659659294> ${amount} to ${recipientUser.username}.`
       )
       .setTimestamp();
 
@@ -1436,7 +1586,7 @@ client.on("messageCreate", async (message) => {
     const betAmount = parseInt(args[0]);
     const bet = args[1];
 
-    if (!betAmount || betAmount > 10000 || betAmount < 0) {
+    if (!betAmount) {
       return message.channel.send("You must put in a valid amount to bet");
     }
 
@@ -1471,7 +1621,7 @@ client.on("messageCreate", async (message) => {
     } else {
       const embed = new EmbedBuilder()
         .setColor("Red")
-        .setTitle("Lost money")
+        .setTitle("Win money")
         .setAuthor({
           name: `${message.author.username}`,
           iconURL: `${message.author.displayAvatarURL()}`,
@@ -1485,9 +1635,6 @@ client.on("messageCreate", async (message) => {
       message.channel.send({ embeds: [embed] });
     }
   }
-
-  // if (command === "shop") {
-  // }
 
   if (command === "backup" && storage[message.author.id].contributor) {
     backup();
