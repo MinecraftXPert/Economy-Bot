@@ -1584,13 +1584,13 @@ client.on("messageCreate", async (message) => {
     const coinFlip = Math.random() > 0.5 ? "heads" : "tails";
 
     const betAmount = parseInt(args[0]);
-    const bet = args[1];
+    const bet = args[1].toLowerCase();
 
-    if (!betAmount) {
+    if (!betAmount || betAmount > 10000 || betAmount < 0) {
       return message.channel.send("You must put in a valid amount to bet");
     }
 
-    if (!bet) {
+    if (!bet||!["heads","tails"].includes(bet)) {
       return message.channel.send("You must either bet heads or tails");
     }
 
@@ -1621,7 +1621,7 @@ client.on("messageCreate", async (message) => {
     } else {
       const embed = new EmbedBuilder()
         .setColor("Red")
-        .setTitle("Win money")
+        .setTitle("Lost money")
         .setAuthor({
           name: `${message.author.username}`,
           iconURL: `${message.author.displayAvatarURL()}`,
