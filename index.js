@@ -1584,7 +1584,11 @@ client.on("messageCreate", async (message) => {
     const coinFlip = Math.random() > 0.5 ? "heads" : "tails";
 
     const betAmount = parseInt(args[0]);
-    const bet = args[1].toLowerCase();
+    const bet = args[1]?.toLowerCase();
+
+    if (!betAmount) {
+      return message.channel.send("You must put in an amount to bet.")
+    }
 
     if (!betAmount || betAmount > 10000 || betAmount < 0) {
       return message.channel.send("You must put in a valid amount to bet");
