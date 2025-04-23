@@ -109,6 +109,13 @@ function updateSolana() {
 
 setInterval(updateSolana, 5 * 60 * 1000); // updates cost of solana every 5 minutes
 
+function commafy(num) {
+  num = num.toString();
+  var pattern = /(-?\d+)(\d{3})/;
+  while (pattern.test(num)) num = num.replace(pattern, "$1,$2");
+  return num;
+}
+
 client.on("ready", async () => {
   console.log("The bot is online!");
 
@@ -663,26 +670,26 @@ client.on("messageCreate", async (message) => {
           {
             name: "**Bank**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].bank
+              commafy(storage[message.author.id].bank)
             }**`,
             inline: true,
           },
           {
             name: "**Cash**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].money
+              commafy(storage[message.author.id].money)
             }**`,
             inline: true,
           },
           {
             name: "**Total**",
-            value: `**<:points:1102646967659659294> ${totalMoney}**`,
+            value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
             inline: true,
           },
           {
             name: "**Solana**",
             value: `**<:points:1102646967659659294> ${
-              storage[message.author.id].solana
+              commafy(storage[message.author.id].solana)
             }**`,
             inline: true,
           }
@@ -728,17 +735,22 @@ client.on("messageCreate", async (message) => {
       .addFields(
         {
           name: "**Bank**",
-          value: `**<:points:1102646967659659294> ${targetStorage.bank}**`,
+          value: `**<:points:1102646967659659294> ${commafy(targetStorage.bank)}**`,
           inline: true,
         },
         {
           name: "**Cash**",
-          value: `**<:points:1102646967659659294> ${targetStorage.money}**`,
+          value: `**<:points:1102646967659659294> ${commafy(targetStorage.money)}**`,
           inline: true,
         },
         {
           name: "**Total**",
-          value: `**<:points:1102646967659659294> ${totalMoney}**`,
+          value: `**<:points:1102646967659659294> ${commafy(totalMoney)}**`,
+          inline: true,
+        },
+        {
+          name: "**Solana**",
+          value: `**<:points:1102646967659659294> ${commafy(targetStorage.solana)}**`,
           inline: true,
         }
       )
@@ -849,7 +861,6 @@ client.on("messageCreate", async (message) => {
       } else {
         storage[message.author.id].numTimesWorked = 0;
       }
-      
     }
   }
 
@@ -1254,7 +1265,7 @@ client.on("messageCreate", async (message) => {
               `${index + 1}. ${
                 member.user.username
               } - <:points:1102646967659659294> ${
-                storage[member.id].money + storage[member.id].bank
+                commafy(storage[member.id].money + storage[member.id].bank)
               }`
           )
           .join("\n")
@@ -1719,7 +1730,9 @@ client.on("messageCreate", async (message) => {
       return message.channel.send("You don't have a job right now");
     }
 
-    message.channel.send(`Your current job is a ${storage[message.author.id].job}`)
+    message.channel.send(
+      `Your current job is a ${storage[message.author.id].job}`
+    );
   }
 
   if (command === "backup" && storage[message.author.id].contributor) {
