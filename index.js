@@ -15,7 +15,7 @@ require("dotenv").config();
 const TOKEN = process.env.DISCORD_TOKEN;
 const { ActivityType } = require("discord.js");
 
-const prefix = "!";
+const prefix = "$";
 const timer = {};
 const crimeTimer = {};
 const weeklyTimer = {};
@@ -134,114 +134,133 @@ const jobs = [
     description: "Sweep streets and collects trash",
     income: 100,
     level: 1,
+    cooldown: 300000,
   },
   {
     title: "Cashier",
     description: "Handle transactions and assist customers.",
     income: 100,
     level: 1,
+    cooldown: 300000,
   },
   {
     title: "Barista",
     description: "Prepare and serve coffee.",
     income: 100,
     level: 1,
+    cooldown: 300000,
   },
   {
     title: "Retail Associate",
     description: "Assist customers and restock shelves.",
     income: 100,
     level: 1,
+    cooldown: 300000,
   },
   {
     title: "Delivery Driver",
     description: "Deliver packages to customers.",
     income: 100,
     level: 1,
+    cooldown: 300000,
   },
   {
     title: "Customer Service Representative",
     description: "Assist customers with inquiries.",
     income: 120,
     level: 2,
+    cooldown: 330000,
   },
   {
     title: "Discord Mod",
     description: "Get fat and don't ever touch grass.",
     income: 120,
     level: 2,
+    cooldown: 330000,
   },
   {
     title: "Administrative Assistant",
     description: "Perform clerical tasks and support office operations.",
     income: 150,
     level: 3,
+    cooldown: 390000,
   },
   {
     title: "Sales Associate",
     description: "Promote products and achieve sales targets.",
     income: 150,
     level: 3,
+    cooldown: 390000,
   },
   {
     title: "Warehouse Worker",
     description: "Handle inventory and pack orders.",
     income: 150,
     level: 3,
+    cooldown: 390000,
   },
   {
     title: "Receptionist",
     description: "Greet visitors and manage front desk.",
     income: 150,
     level: 3,
+    cooldown: 390000,
   },
   {
     title: "Data Entry Clerk",
     description: "Input and update data.",
     income: 175,
     level: 4,
+    cooldown: 420000,
   },
   {
     title: "Security Guard",
     description: "Protect property and individuals.",
     income: 175,
     level: 4,
+    cooldown: 420000,
   },
   {
     title: "Technical Support Specialist",
     description: "Provide technical assistance.",
     income: 175,
     level: 4,
+    cooldown: 420000,
   },
   {
     title: "Marketing Coordinator",
     description: "Assist in marketing campaigns.",
     income: 200,
     level: 5,
+    cooldown: 480000,
   },
   {
     title: "Software Developer",
     description: "Develop and maintain software.",
     income: 200,
     level: 5,
+    cooldown: 480000,
   },
   {
     title: "Project Manager",
     description: "Oversee and manage projects.",
     income: 200,
     level: 5,
+    cooldown: 480000,
   },
   {
     title: "Data Scientist",
     description: "Analyze and interpret data.",
     income: 200,
     level: 5,
+    cooldown: 480000,
   },
   {
     title: "Lawyer",
     description: "Send ppl to jail.",
     income: 500,
     level: 6,
+    cooldown: 1020000,
   },
   { title: "Doctor", description: "Fix ppl.", income: 500, level: 6 },
   {
@@ -249,6 +268,7 @@ const jobs = [
     description: "Make lots of money while not touching grass.",
     income: 1000,
     level: 7,
+    cooldown: 1980000,
   },
 ];
 
@@ -737,7 +757,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**list (optional: desc)**\nWill give the list of jobs you can apply for and their income\n\n**beg**\nBeg for money\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)\n\n**give**\nWill allow you to give a certain amount of money to someone`
+        `These are the list of commands and the current prefix is \`${prefix}\`\n\n**ping**\nChecks to see if the bot is online\n\n**join**\nCreate an account\n\n**daily**\nAllows you to collect your daily income\n\n**crime**\nAllows you to commit a crime\n\n**weekly**\nAllows you to collect your weekly income\n\n**bal**\nChecks your current balance\n\n**beg**\nBeg for money if you're jobless\n\n**stream**\nStream for some money\n\n**leaderboard**\nChecks what position you are on the leaderboard\n\n**with (amount)**\nWill withdraw a certain amount of money from your bank account to your cash amount\n\n**dep (amount)**\nWill deposit a certain amount of money from your cash account to your bank account\n\n**buy (amount)**\nWill allow you buy solana\n\n**sell (amount)**\nWill allow you to sell solana\n\n**cost**\nWill show the current cost of solana (updates every 5 minutes)\n\n**give**\nWill allow you to give a certain amount of money to someone\n\n**apply**\nAllows you to apply for a job in which you can make more money the more you use the command\n\n**work**\n\nAllows you to work for your money\n**resign**\nResign from a job\n\n**list (optional: desc)**\nAllows you to see all the list of jobs that you can potentially have\n\n**job**\nSee what job you have now`
       )
       .setTimestamp();
 
@@ -802,6 +822,8 @@ client.on("messageCreate", async (message) => {
       storage[message.author.id].job = jobs[jobPick - 1].title;
       storage[message.author.id].hasJob = true;
       storage[message.author.id].income = jobs[jobPick - 1].income;
+      storage[message.author.id].workCoolDowns = jobs[jobPick - 1].cooldown;
+
       const embed = new EmbedBuilder()
         .setColor("Green")
         .setAuthor({
@@ -820,13 +842,14 @@ client.on("messageCreate", async (message) => {
         .setTimestamp();
 
       message.channel.send({ embeds: [embed] });
+      save();
       // placed down here so you can actually keep your progress
       if (storage[message.author.id].numTimesWorked > 0) {
         return;
       } else {
         storage[message.author.id].numTimesWorked = 0;
       }
-      save();
+      
     }
   }
 
@@ -838,11 +861,15 @@ client.on("messageCreate", async (message) => {
       return;
     }
 
+    if (!storage[message.author.id].hasJob) {
+      return message.channel.send(
+        "You don't even have a job yet so why are you quitting lol?"
+      );
+    }
+
     storage[message.author.id].hasJob = false;
     delete storage[message.author.id].job;
     delete storage[message.author.id].income;
-
-    save();
     const embed = new EmbedBuilder()
       .setColor("Red")
       .setAuthor({
@@ -855,6 +882,7 @@ client.on("messageCreate", async (message) => {
       .setTimestamp();
 
     message.channel.send({ embeds: [embed] });
+    save();
   }
 
   if (command === "work") {
@@ -870,6 +898,9 @@ client.on("messageCreate", async (message) => {
         `It looks you don't have a job so you can't use this command. Use the \`${prefix}apply\` command to get a job.`
       );
     }
+
+    const lastUsage = storage[message.author.id].lastWorked || 0;
+    const now = Date.now();
 
     const embed2 = new EmbedBuilder()
       .setColor("Green")
@@ -917,26 +948,56 @@ client.on("messageCreate", async (message) => {
         break;
     }
 
-    const embed = new EmbedBuilder()
-      .setColor("Green")
-      .setTitle("Worked Shift")
-      .setDescription(
-        `You worked as a ${
-          storage[message.author.id].job
-        } and earned <:points:1102646967659659294> ${
-          storage[message.author.id].income
-        }`
-      )
-      .setAuthor({
-        name: `${message.author.username}`,
-        iconURL: `${message.author.displayAvatarURL()}`,
-        url: `https://discord.com/users/${message.author.id}`,
-      })
-      .setTimestamp();
-    message.channel.send({ embeds: [embed] });
-    storage[message.author.id].numTimesWorked++;
-    storage[message.author.id].money += storage[message.author.id].income;
-    save();
+    if (now - lastUsage >= storage[message.author.id].workCoolDowns) {
+      const embed = new EmbedBuilder()
+        .setColor("Green")
+        .setTitle("Worked Shift")
+        .setDescription(
+          `You worked as a ${
+            storage[message.author.id].job
+          } and earned <:points:1102646967659659294> ${
+            storage[message.author.id].income
+          }`
+        )
+        .setAuthor({
+          name: `${message.author.username}`,
+          iconURL: `${message.author.displayAvatarURL()}`,
+          url: `https://discord.com/users/${message.author.id}`,
+        })
+        .setTimestamp();
+      message.channel.send({ embeds: [embed] });
+      storage[message.author.id].numTimesWorked++;
+      storage[message.author.id].money += storage[message.author.id].income;
+      storage[message.author.id].lastWorked = now;
+      save();
+    } else {
+      const timeRemaining =
+        storage[message.author.id].workCoolDowns - (now - lastUsage);
+      const daysRemaining = Math.floor(timeRemaining / (24 * 60 * 60 * 1000));
+      const hoursRemaining = Math.floor(
+        (timeRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)
+      );
+      const minutesRemaining = Math.floor(
+        (timeRemaining % (60 * 60 * 1000)) / (60 * 1000)
+      );
+      const secondsRemaining = Math.floor((timeRemaining % (60 * 1000)) / 1000);
+
+      const embed3 = new EmbedBuilder()
+        .setColor("Green")
+        .setDescription(
+          `This command is on cooldown. Please wait ${daysRemaining} day${
+            daysRemaining !== 1 ? "s" : ""
+          }, ${hoursRemaining} hour${
+            hoursRemaining !== 1 ? "s" : ""
+          }, ${minutesRemaining} minute${
+            minutesRemaining !== 1 ? "s" : ""
+          }, and ${secondsRemaining} second${
+            secondsRemaining !== 1 ? "s" : ""
+          } before trying again.`
+        )
+        .setTimestamp();
+      message.channel.send({ embeds: [embed3] });
+    }
   }
 
   if (command === "list") {
@@ -1005,6 +1066,12 @@ client.on("messageCreate", async (message) => {
         `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
       );
       return;
+    }
+
+    if (storage[message.author.id].hasJob) {
+      return message.channel.send(
+        "Looks like you already have a job so you don't need to beg."
+      );
     }
 
     const begMoney = randomNumFromInterval(50, 150);
@@ -1587,14 +1654,14 @@ client.on("messageCreate", async (message) => {
     const bet = args[1]?.toLowerCase();
 
     if (!betAmount) {
-      return message.channel.send("You must put in an amount to bet.")
+      return message.channel.send("You must put in an amount to bet.");
     }
 
     if (!betAmount || betAmount > 10000 || betAmount < 0) {
       return message.channel.send("You must put in a valid amount to bet");
     }
 
-    if (!bet||!["heads","tails"].includes(bet)) {
+    if (!bet || !["heads", "tails"].includes(bet)) {
       return message.channel.send("You must either bet heads or tails");
     }
 
@@ -1638,6 +1705,21 @@ client.on("messageCreate", async (message) => {
 
       message.channel.send({ embeds: [embed] });
     }
+  }
+
+  if (command === "job") {
+    if (!storage[message.author.id].joined) {
+      message.channel.send(
+        `Whoops! You need to join first! Use the \`${prefix}join\` command to join in and get started!`
+      );
+      return;
+    }
+
+    if (!storage[message.author.id].job) {
+      return message.channel.send("You don't have a job right now");
+    }
+
+    message.channel.send(`Your current job is a ${storage[message.author.id].job}`)
   }
 
   if (command === "backup" && storage[message.author.id].contributor) {
