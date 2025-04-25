@@ -669,16 +669,16 @@ client.on("messageCreate", async (message) => {
         .addFields(
           {
             name: "**Bank**",
-            value: `**<:points:1102646967659659294> ${
-              commafy(storage[message.author.id].bank)
-            }**`,
+            value: `**<:points:1102646967659659294> ${commafy(
+              storage[message.author.id].bank
+            )}**`,
             inline: true,
           },
           {
             name: "**Cash**",
-            value: `**<:points:1102646967659659294> ${
-              commafy(storage[message.author.id].money)
-            }**`,
+            value: `**<:points:1102646967659659294> ${commafy(
+              storage[message.author.id].money
+            )}**`,
             inline: true,
           },
           {
@@ -688,9 +688,9 @@ client.on("messageCreate", async (message) => {
           },
           {
             name: "**Solana**",
-            value: `**<:points:1102646967659659294> ${
-              commafy(storage[message.author.id].solana)
-            }**`,
+            value: `**<:points:1102646967659659294> ${commafy(
+              storage[message.author.id].solana
+            )}**`,
             inline: true,
           }
         )
@@ -735,12 +735,16 @@ client.on("messageCreate", async (message) => {
       .addFields(
         {
           name: "**Bank**",
-          value: `**<:points:1102646967659659294> ${commafy(targetStorage.bank)}**`,
+          value: `**<:points:1102646967659659294> ${commafy(
+            targetStorage.bank
+          )}**`,
           inline: true,
         },
         {
           name: "**Cash**",
-          value: `**<:points:1102646967659659294> ${commafy(targetStorage.money)}**`,
+          value: `**<:points:1102646967659659294> ${commafy(
+            targetStorage.money
+          )}**`,
           inline: true,
         },
         {
@@ -750,7 +754,9 @@ client.on("messageCreate", async (message) => {
         },
         {
           name: "**Solana**",
-          value: `**<:points:1102646967659659294> ${commafy(targetStorage.solana)}**`,
+          value: `**<:points:1102646967659659294> ${commafy(
+            targetStorage.solana
+          )}**`,
           inline: true,
         }
       )
@@ -1264,9 +1270,9 @@ client.on("messageCreate", async (message) => {
             (member, index) =>
               `${index + 1}. ${
                 member.user.username
-              } - <:points:1102646967659659294> ${
-                commafy(storage[member.id].money + storage[member.id].bank)
-              }`
+              } - <:points:1102646967659659294> ${commafy(
+                storage[member.id].money + storage[member.id].bank
+              )}`
           )
           .join("\n")
       )
@@ -1544,9 +1550,9 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have sold all of your Solana for <:points:1102646967659659294> ${
+          `You have sold all of your Solana for <:points:1102646967659659294> ${commafy(
             costOfSolana * sellNumSolana
-          }`
+          )}`
         )
         .setTimestamp();
 
