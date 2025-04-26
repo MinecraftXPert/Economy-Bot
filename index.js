@@ -932,39 +932,6 @@ client.on("messageCreate", async (message) => {
       })
       .setTimestamp();
 
-    switch (storage[message.author.id].numTimesWorked) {
-      case 20:
-        message.channel.send({ embeds: [embed2] });
-        storage[message.author.id].numJobsCanApply += 2;
-        storage[message.author.id].jobLevel++;
-        break;
-      case 50:
-        message.channel.send({ embeds: [embed2] });
-        storage[message.author.id].numJobsCanApply += 4;
-        storage[message.author.id].jobLevel++;
-        break;
-      case 80:
-        message.channel.send({ embeds: [embed2] });
-        storage[message.author.id].numJobsCanApply += 3;
-        storage[message.author.id].jobLevel++;
-        break;
-      case 140:
-        message.channel.send({ embeds: [embed2] });
-        storage[message.author.id].numJobsCanApply += 4;
-        storage[message.author.id].jobLevel++;
-        break;
-      case 200:
-        message.channel.send({ embeds: [embed2] });
-        storage[message.author.id].numJobsCanApply += 1;
-        storage[message.author.id].jobLevel++;
-        break;
-      case 300:
-        message.channel.send({ embeds: [embed2] });
-        storage[message.author.id].numJobsCanApply += 1;
-        storage[message.author.id].jobLevel++;
-        break;
-    }
-
     if (now - lastUsage >= storage[message.author.id].workCoolDowns) {
       const embed = new EmbedBuilder()
         .setColor("Green")
@@ -982,11 +949,12 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setTimestamp();
-      message.channel.send({ embeds: [embed] });
       storage[message.author.id].numTimesWorked++;
       storage[message.author.id].money += storage[message.author.id].income;
       storage[message.author.id].lastWorked = now;
       save();
+      message.channel.send({ embeds: [embed] });
+      console.log(storage[message.author.id].numTimesWorked);
     } else {
       const timeRemaining =
         storage[message.author.id].workCoolDowns - (now - lastUsage);
@@ -1014,6 +982,51 @@ client.on("messageCreate", async (message) => {
         )
         .setTimestamp();
       message.channel.send({ embeds: [embed3] });
+    }
+
+    switch (storage[message.author.id].numTimesWorked) {
+      case 20:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 2;
+        storage[message.author.id].jobLevel++;
+        delete storage[message.author.id].lastWorked;
+        save();
+        break;
+      case 50:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 4;
+        storage[message.author.id].jobLevel++;
+        delete storage[message.author.id].lastWorked;
+        save();
+        break;
+      case 80:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 3;
+        storage[message.author.id].jobLevel++;
+        delete storage[message.author.id].lastWorked;
+        save();
+        break;
+      case 140:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 4;
+        storage[message.author.id].jobLevel++;
+        delete storage[message.author.id].lastWorked;
+        save();
+        break;
+      case 200:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 1;
+        storage[message.author.id].jobLevel++;
+        delete storage[message.author.id].lastWorked;
+        save();
+        break;
+      case 300:
+        message.channel.send({ embeds: [embed2] });
+        storage[message.author.id].numJobsCanApply += 1;
+        storage[message.author.id].jobLevel++;
+        delete storage[message.author.id].lastWorked;
+        save();
+        break;
     }
   }
 
@@ -1550,9 +1563,9 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have sold all of your Solana for <:points:1102646967659659294> ${commafy(
+          `You have sold all of your Solana for <:points:1102646967659659294> ${
             costOfSolana * sellNumSolana
-          )}`
+          }`
         )
         .setTimestamp();
 
