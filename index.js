@@ -1564,7 +1564,7 @@ client.on("messageCreate", async (message) => {
         })
         .setDescription(
           `You have sold all of your Solana for <:points:1102646967659659294> ${
-            costOfSolana * sellNumSolana
+            commafy(costOfSolana * sellNumSolana)
           }`
         )
         .setTimestamp();
