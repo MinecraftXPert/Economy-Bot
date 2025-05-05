@@ -15,6 +15,8 @@ require("dotenv").config();
 const TOKEN = process.env.DISCORD_TOKEN;
 const { ActivityType } = require("discord.js");
 
+const CLASSICNOAH = "592825756095348748";
+
 const prefix = "$";
 const timer = {};
 const crimeTimer = {};
@@ -269,7 +271,13 @@ const jobs = [
     level: 6,
     cooldown: 1020000,
   },
-  { title: "Doctor", description: "Fix ppl.", income: 500, level: 6 },
+  {
+    title: "Doctor",
+    description: "Fix ppl.",
+    income: 500,
+    level: 6,
+    cooldown: 1020000,
+  },
   {
     title: "CEO of Discord",
     description: "Make lots of money while not touching grass.",
@@ -1015,7 +1023,7 @@ client.on("messageCreate", async (message) => {
         break;
       case 200:
         message.channel.send({ embeds: [embed2] });
-        storage[message.author.id].numJobsCanApply += 1;
+        storage[message.author.id].numJobsCanApply += 2;
         storage[message.author.id].jobLevel++;
         delete storage[message.author.id].lastWorked;
         save();
@@ -1564,7 +1572,7 @@ client.on("messageCreate", async (message) => {
         })
         .setDescription(
           `You have sold all of your Solana for <:points:1102646967659659294> ${
-            commafy(costOfSolana * sellNumSolana)
+            costOfSolana * sellNumSolana
           }`
         )
         .setTimestamp();
@@ -1758,6 +1766,23 @@ client.on("messageCreate", async (message) => {
     backup();
     message.channel.send("Data succesfully backed up to `./backup.json`");
     return;
+  }
+
+  if (command === "debug") {
+    if (message.author.id != CLASSICNOAH) {
+      return message.channel.send("Sorry, but you can't use this command.");
+    }
+
+    const arg1 = args[0];
+    const target = args[1];
+
+    if (arg1 === "work") {
+      message.channel.send(
+        "This user has worked " +
+          storage[message.target.id].numTimesWorked +
+          " times"
+      );
+    }
   }
 });
 
