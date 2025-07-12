@@ -17,7 +17,7 @@ const { ActivityType } = require("discord.js");
 
 const CLASSICNOAH = "592825756095348748";
 
-const prefix = "$";
+const prefix = "!";
 const timer = {};
 const crimeTimer = {};
 const weeklyTimer = {};
@@ -1493,7 +1493,7 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have successfully bought all the Solana you can afford.`
+          `You have successfully bought all the Solana you can afford for $${costOfSolana} each`
         )
         .setTimestamp();
 
@@ -1510,9 +1510,9 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `You have successfully bought ${numSolana} Solana for <:points:1102646967659659294> ${
+        `You have successfully bought ${numSolana} Solana for <:points:1102646967659659294> ${commafy(
           costOfSolana * numSolana
-        }`
+        )}`
       )
       .setTimestamp();
 
@@ -1571,9 +1571,9 @@ client.on("messageCreate", async (message) => {
           url: `https://discord.com/users/${message.author.id}`,
         })
         .setDescription(
-          `You have sold all of your Solana for <:points:1102646967659659294> ${
+          `You have sold all of your Solana for <:points:1102646967659659294> ${commafy(
             costOfSolana * sellNumSolana
-          }`
+          )} at ${costOfSolana} each.`
         )
         .setTimestamp();
 
@@ -1769,17 +1769,17 @@ client.on("messageCreate", async (message) => {
   }
 
   if (command === "debug") {
-    if (message.author.id != CLASSICNOAH) {
+    if (message.author.id !== CLASSICNOAH) {
       return message.channel.send("Sorry, but you can't use this command.");
     }
 
     const arg1 = args[0];
-    const target = args[1];
+    const arg2 = args[1];
 
     if (arg1 === "work") {
       message.channel.send(
-        "This user has worked " +
-          storage[message.target.id].numTimesWorked +
+        "This user has used the $work commmand " +
+          storage[arg2].numTimesWorked +
           " times"
       );
     }
