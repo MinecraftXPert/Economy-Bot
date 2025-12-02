@@ -17,7 +17,7 @@ const { ActivityType } = require("discord.js");
 
 const CLASSICNOAH = "592825756095348748";
 
-const prefix = "!";
+const prefix = "$";
 const timer = {};
 const crimeTimer = {};
 const weeklyTimer = {};
@@ -67,31 +67,6 @@ const client = new Client({
   ],
 });
 
-client.on("guildCreate", async (guild) => {
-  // Fetch the server owner's information
-  const serverOwner = await guild.fetchOwner();
-
-  // Sending the invite information to the bot owner
-  try {
-    const botOwner = await client.users.fetch("592825756095348748");
-    const embed = new EmbedBuilder()
-      .setColor("Green")
-      .setTitle("New Server Invite")
-      .addFields(
-        { name: `Server name`, value: `${guild.name}` },
-        {
-          name: `Server Owner`,
-          value: `${serverOwner.user.tag} (${serverOwner.user.id})`,
-        }
-      )
-      .setTimestamp();
-    await botOwner.send({ embeds: [embed] });
-    console.log("Sent server invite information to bot owner.");
-  } catch (error) {
-    console.error("Failed to send server invite information:", error);
-  }
-});
-
 function save() {
   fs.writeFileSync("./storage.json", JSON.stringify(storage));
 }
@@ -105,11 +80,56 @@ function randomNumFromInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function updateSolana() {
-  costOfSolana = randomNumFromInterval(150, 200).toString();
+function bellCurveRandom() {
+  while (true) {
+    let num1 = Math.random();
+    let num2 = Math.random();
+    if (num2 < num1) {
+      return num1;
+    }
+  }
+};
+
+function constrain(value, low, high) {
+  return Math.max(low, Math.min(value, high));
 }
 
-setInterval(updateSolana, 5 * 60 * 1000); // updates cost of solana every 5 minutes
+var pastPrices = [costOfSolana];
+var trending = 0;
+
+function updateSolana() {
+  if (trending === 0) {
+    trending = Math.floor((bellCurveRandom() * -5) + 6) * ((Math.round(Math.random()) * 2) - 1);
+  }
+  if (trending > 0) {
+    trending--;
+    if (pastPrices[pastPrices.length - 1] === 200) {
+      trending = 0;
+      if (pastPrices[Math.max(pastPrices.length - 1, 0)] === 200 && pastPrices[Math.max(pastPrices.length - 2, 0)] === 200 && pastPrices[Math.max(pastPrices.length - 3, 0)] === 200) {
+        trending = Math.floor((bellCurveRandom() * -5) + 6) * -1;
+      }
+    }
+    costOfSolana = constrain(pastPrices[pastPrices.length - 1] + (Math.floor((bellCurveRandom() * -5) + 5)), 150, 200);
+  } else if (trending < 0) {
+    trending++;
+    if (pastPrices[pastPrices.length - 1] === 150) {
+      trending = 0;
+      if (pastPrices[Math.max(pastPrices.length - 1, 0)] === 150 && pastPrices[Math.max(pastPrices.length - 2, 0)] === 150 && pastPrices[Math.max(pastPrices.length - 3, 0)] === 150) {
+        trending = Math.floor((bellCurveRandom() * -5) + 6);
+      }
+    }
+    costOfSolana = constrain(pastPrices[pastPrices.length - 1] + (Math.floor(bellCurveRandom() * -5) + 5) * -1, 150, 200);
+  } else {
+    costOfSolana = pastPrices[pastPrices.length - 1];
+  }
+  pastPrices.push(costOfSolana);
+  if (pastPrices.length > 5) {
+    pastPrices.shift();
+  }
+  costOfSolana = costOfSolana.toString();
+}
+
+setInterval(updateSolana, 60 * 1000); // updates cost of solana every minute
 
 function commafy(num) {
   num = num.toString();
@@ -304,6 +324,52 @@ client.on("messageCreate", async (message) => {
     });
   }
 
+  if (`${message.content.toLowerCase()}`.includes("dolphin")) {
+    message.react("🐬").catch((error) => {
+      console.log(error);
+    });
+  }
+
+  if (`${message.content.toLowerCase()}`.includes("opensesame")) {
+    if (trending < 0) {
+      message.react("➖").catch((error) => {
+        console.log(error);
+      });
+    }
+    console.log(Math.abs(trending));
+    switch (Math.abs(trending)) {
+      case 0:
+        message.react("0️⃣").catch((error) => {
+          console.log(error);
+        });
+        break;
+      case 1:
+        message.react("1️⃣").catch((error) => {
+          console.log(error);
+        });
+        break;
+      case 2:
+        message.react("2️⃣").catch((error) => {
+          console.log(error);
+        });
+        break;
+      case 3:
+        message.react("3️⃣").catch((error) => {
+          console.log(error);
+        });
+        break; 
+      case 4:
+        message.react("4️⃣").catch((error) => {
+          console.log(error);
+        });
+        break;
+      default:
+        message.react("5️⃣").catch((error) => {
+          console.log(error);
+        });
+    }
+  }
+
   // If your message doesn't start with the prefix, the bot will ignore your message
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
@@ -425,8 +491,7 @@ client.on("messageCreate", async (message) => {
           const embed = new EmbedBuilder()
             .setColor("Green")
             .setDescription(
-              `This command is on cooldown. Please wait ${hoursRemaining} hour${
-                hoursRemaining > 1 ? "s" : ""
+              `This command is on cooldown. Please wait ${hoursRemaining} hour${hoursRemaining > 1 ? "s" : ""
               } before trying again.`
             )
             .setTimestamp();
@@ -435,8 +500,7 @@ client.on("messageCreate", async (message) => {
           const embed2 = new EmbedBuilder()
             .setColor("Green")
             .setDescription(
-              `This command is on cooldown. Please wait ${hoursRemaining} hour${
-                hoursRemaining > 1 ? "s" : ""
+              `This command is on cooldown. Please wait ${hoursRemaining} hour${hoursRemaining > 1 ? "s" : ""
               } before trying again.`
             )
             .setTimestamp();
@@ -497,8 +561,7 @@ client.on("messageCreate", async (message) => {
             url: `https://discord.com/users/${message.author.id}`,
           })
           .setDescription(
-            `${
-              negative[badMessage]
+            `${negative[badMessage]
             } <:points:1102646967659659294> ${-crimeAmount}`
           )
           .setTimestamp();
@@ -640,10 +703,8 @@ client.on("messageCreate", async (message) => {
       const embed = new EmbedBuilder()
         .setColor("Green")
         .setDescription(
-          `This command is on cooldown. Please wait ${daysRemaining} day${
-            daysRemaining > 1 ? "s" : ""
-          } and ${hoursRemaining} hour${
-            hoursRemaining > 1 ? "s" : ""
+          `This command is on cooldown. Please wait ${daysRemaining} day${daysRemaining > 1 ? "s" : ""
+          } and ${hoursRemaining} hour${hoursRemaining > 1 ? "s" : ""
           } before trying again.`
         )
         .setTimestamp();
@@ -800,8 +861,7 @@ client.on("messageCreate", async (message) => {
 
     if (storage[message.author.id].hasJob) {
       message.channel.send(
-        `Looks like you already have a job as a ${
-          storage[message.author.id].job
+        `Looks like you already have a job as a ${storage[message.author.id].job
         }. If you would like a new job, please use the \`${prefix}resign\` command to resign your position and get a new job.`
       );
       return;
@@ -859,10 +919,8 @@ client.on("messageCreate", async (message) => {
         })
         .setTitle("Applied Success")
         .setDescription(
-          `You have successfully applied for the job as a ${
-            storage[message.author.id].job
-          }! You will now have an income of <:points:1102646967659659294> ${
-            storage[message.author.id].income
+          `You have successfully applied for the job as a ${storage[message.author.id].job
+          }! You will now have an income of <:points:1102646967659659294> ${storage[message.author.id].income
           } until you start moving up the ranks.`
         )
         .setTimestamp();
@@ -945,10 +1003,8 @@ client.on("messageCreate", async (message) => {
         .setColor("Green")
         .setTitle("Worked Shift")
         .setDescription(
-          `You worked as a ${
-            storage[message.author.id].job
-          } and earned <:points:1102646967659659294> ${
-            storage[message.author.id].income
+          `You worked as a ${storage[message.author.id].job
+          } and earned <:points:1102646967659659294> ${storage[message.author.id].income
           }`
         )
         .setAuthor({
@@ -978,14 +1034,10 @@ client.on("messageCreate", async (message) => {
       const embed3 = new EmbedBuilder()
         .setColor("Green")
         .setDescription(
-          `This command is on cooldown. Please wait ${daysRemaining} day${
-            daysRemaining !== 1 ? "s" : ""
-          }, ${hoursRemaining} hour${
-            hoursRemaining !== 1 ? "s" : ""
-          }, ${minutesRemaining} minute${
-            minutesRemaining !== 1 ? "s" : ""
-          }, and ${secondsRemaining} second${
-            secondsRemaining !== 1 ? "s" : ""
+          `This command is on cooldown. Please wait ${daysRemaining} day${daysRemaining !== 1 ? "s" : ""
+          }, ${hoursRemaining} hour${hoursRemaining !== 1 ? "s" : ""
+          }, ${minutesRemaining} minute${minutesRemaining !== 1 ? "s" : ""
+          }, and ${secondsRemaining} second${secondsRemaining !== 1 ? "s" : ""
           } before trying again.`
         )
         .setTimestamp();
@@ -1194,6 +1246,7 @@ client.on("messageCreate", async (message) => {
       const streamerNames = [
         "JoeIsPro",
         "Classic Noah",
+        "Pineapples",
         "Bob",
         "LunaStreams",
         "GamingWithGrace",
@@ -1289,8 +1342,7 @@ client.on("messageCreate", async (message) => {
         leaderboard
           .map(
             (member, index) =>
-              `${index + 1}. ${
-                member.user.username
+              `${index + 1}. ${member.user.username
               } - <:points:1102646967659659294> ${commafy(
                 storage[member.id].money + storage[member.id].bank
               )}`
@@ -1591,8 +1643,7 @@ client.on("messageCreate", async (message) => {
         url: `https://discord.com/users/${message.author.id}`,
       })
       .setDescription(
-        `You have sold ${sellNumSolana} Solana for <:points:1102646967659659294> ${
-          costOfSolana * sellNumSolana
+        `You have sold ${sellNumSolana} Solana for <:points:1102646967659659294> ${costOfSolana * sellNumSolana
         }`
       )
       .setTimestamp();
@@ -1779,8 +1830,8 @@ client.on("messageCreate", async (message) => {
     if (arg1 === "work") {
       message.channel.send(
         "This user has used the $work commmand " +
-          storage[arg2].numTimesWorked +
-          " times"
+        storage[arg2].numTimesWorked +
+        " times"
       );
     }
   }
