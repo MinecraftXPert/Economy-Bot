@@ -1402,7 +1402,7 @@ client.on("messageCreate", async (message) => {
 
       message.channel.send({ embeds: [embed2] });
     }
-    
+
     // otherwise get the server leaderboard
     else {
       // get all the members in a server
