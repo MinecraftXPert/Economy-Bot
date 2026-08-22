@@ -36,4 +36,4 @@ These are the rights given as a user of this bot
 This privacy policy may be updated from time to time. users will be notified of any changes.
 
 ## 6) Contact Information
-For any questions or concerns about this privacy policy, please contact at noahrang02@gmail.com
+For any questions or concerns about this privacy policy, please contact me through my discord: Classic Noah.
