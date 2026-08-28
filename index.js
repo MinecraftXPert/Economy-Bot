@@ -2,6 +2,7 @@ const {
   Client,
   GatewayIntentBits,
   EmbedBuilder,
+  AttachmentBuilder,
   PermissionsBitField,
   Permissions,
   Embed,
@@ -14,6 +15,8 @@ let storage = require("./storage.json");
 require("dotenv").config();
 const TOKEN = process.env.DISCORD_TOKEN;
 const { ActivityType } = require("discord.js");
+
+const { createCanvas, loadImage } = require('canvas');
 
 const CLASSICNOAH = "592825756095348748";
 
@@ -144,12 +147,144 @@ function updateSolana() {
     costOfSolana = pastPrices[pastPrices.length - 1];
   }
   pastPrices.push(costOfSolana);
+
+  // updating the cost chart Solana memory
+  prevSolanaCosts.shift();
+  prevSolanaCosts.push(costOfSolana);
+  drawSolanaCostChartImage().then(updateSolanaCostCharts());
   if (pastPrices.length > 5) {
     pastPrices.shift();
   }
 }
 
 setInterval(updateSolana, 60 * 1000); // updates cost of solana every minute
+
+
+const prevSolanaCosts = [];
+
+// giving the chart cost a 25 place memory depth
+for(let i = 0; i < 25; i++){
+  prevSolanaCosts.push(175);
+}
+
+prevSolanaCosts.push(costOfSolana);
+
+// persistent messages
+if(!storage.persistentChannels){
+  // storage.persistentChannels = ["1540803891447210075"];
+  storage.persistentChannels = ["1542662631352176660"];
+  save();
+}
+
+const persistentChannels = storage.persistentChannels;
+
+// drawBlankChart();
+
+drawSolanaCostChartImage().then(updateSolanaCostCharts());
+
+function updateSolanaCostCharts(){
+  const file = new AttachmentBuilder('./solanaCostChart_latest.png', {name: 'cost.png'});
+  for(let i = 0; i < persistentChannels.length; i++){
+    
+    try{
+      let channel = client.channels.cache.get(persistentChannels[i]);
+      channel.bulkDelete(2).then(
+        channel.send(
+          {
+            content: `# Solana Cost: ${prevSolanaCosts[prevSolanaCosts.length-1]}\n-# <t:${Math.floor(Date.now() / 1000)}:F>`,
+            files: [file]
+          })
+      );
+    }catch{
+      console.log(`Error updating persistent message in channel ${persistentChannels[i]} (persistentChannels[${i}])`);
+    }
+  }
+}
+
+// alterRange() works just like map() in arduino C
+function alterRange(x, minIn, maxIn, minOut, maxOut){
+  return (x - minIn) * (maxOut- minOut) / (maxIn - minIn) + minOut;
+}
+
+// base cost chart generation (without the price lines)
+function drawBlankChart(customW, customH){
+  let w = 640, h = 360;
+  if(customW)
+    w = customW;
+  if(customH)
+    h = customH;
+  const canvas = createCanvas(w, h);
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = "#222";
+  ctx.fillRect(0, 0, w, h);
+
+  let horSizeMultiplier = w/(prevSolanaCosts.length-1);
+
+  ctx.fillStyle = "#333";
+  for(let i = 0; i < prevSolanaCosts.length; i++){
+    ctx.fillRect(i*horSizeMultiplier, 0, 2, h);
+  }
+
+  ctx.fillStyle = "#666"
+
+  for(let rows = 1; rows < 10; rows++){
+    ctx.fillRect(0, rows*h/10, w, 2);
+  }
+  
+  const buffer = canvas.toBuffer("image/png");
+  fs.writeFileSync(`./solanaCostChart_blank.png`, buffer);
+}
+
+
+// add fancy lines to cost chart then update file
+async function drawSolanaCostChartImage(){
+  const image = await loadImage("./solanaCostChart_blank.png");
+  let w = image.width, h = image.height;
+  const canvas = createCanvas(image.width, image.height);//createCanvas(w, h);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 2;
+
+  let vertSizeMultiplier = h/50;
+  let horSizeMultiplier = w/(prevSolanaCosts.length-1);
+
+  let style = "yellow";
+
+  let difference = 0;
+  let DifferenceR = "";
+
+  for(let i = 1; i < prevSolanaCosts.length; i++){
+  
+    difference = Math.floor(alterRange((prevSolanaCosts[i] - prevSolanaCosts[i-1]), -6, +6, 0, 255));
+    differenceR = (255-difference).toString(16);
+    difference = (difference).toString(16);
+    switch(true){
+        case (prevSolanaCosts[i] > prevSolanaCosts[i-1]):
+          style = `#00${difference}00`;
+        break;
+        case (prevSolanaCosts[i] < prevSolanaCosts[i-1]):
+          style = `#${differenceR}0000`;
+        break;
+        default:
+          style = `#${differenceR}${differenceR}00`;
+      }
+
+    ctx.beginPath();
+    ctx.moveTo((i-1) * horSizeMultiplier, h-((prevSolanaCosts[i-1]-149)*(h/(50+vertSizeMultiplier))));
+    ctx.lineTo(i * horSizeMultiplier, h-((prevSolanaCosts[i]-149)*(h/(50+vertSizeMultiplier))));
+    ctx.stroke();
+
+    ctx.fillStyle = style;
+    ctx.fillRect((i-1) * horSizeMultiplier, 0, horSizeMultiplier, 5);
+
+    
+  }
+  
+  const buffer = canvas.toBuffer("image/png");
+  fs.writeFileSync(`./solanaCostChart_latest.png`, buffer);
+}
 
 function commafy(num) {
   num = num.toString();
@@ -1760,7 +1895,9 @@ client.on("messageCreate", async (message) => {
       })
       .setTimestamp();
 
-    message.channel.send({ embeds: [embed] });
+    const costChart = new AttachmentBuilder('./solanaCostChart_latest.png', {name: 'cost.png'});
+   
+    message.channel.send({ embeds: [embed], files: [costChart]});
   }
 
   if (command === "give" || command === "donate") {
@@ -1928,6 +2065,28 @@ client.on("messageCreate", async (message) => {
           storage[arg2].numTimesWorked +
           " times",
       );
+    }
+  }
+
+  if(command === "manage" && storage[message.author.id].contributor){
+    switch(args[0]){
+
+      // persistent channels for cost charts
+      case "pc" || "persistentchannels":
+
+        if(args[1] === "add"){
+          storage.persistentChannels.push(args[3])
+        }else if(args[1] === "remove" || args[1] === "rem"){
+          const tempChannels = storage.persistentChannels.filter(item => item !== args[2]);
+          storage.persistentChannels = tempChannels;
+        }else{
+          message.channel.send("argument 2 is an invalid option")
+        }
+      break;
+
+      default:
+        message.channel.send("please enter valid option");
+      break;
     }
   }
 });
