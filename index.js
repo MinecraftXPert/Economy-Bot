@@ -178,6 +178,8 @@ if(!storage.persistentChannels){
 
 const persistentChannels = storage.persistentChannels;
 
+let timesCostChartCalled = 0;
+
 // drawBlankChart();
 
 drawSolanaCostChartImage().then(updateSolanaCostCharts());
@@ -207,7 +209,7 @@ function alterRange(x, minIn, maxIn, minOut, maxOut){
 }
 
 // base cost chart generation (without the price lines)
-function drawBlankChart(customW, customH){
+async function drawBlankChart(customW, customH){
   let w = 640, h = 360;
   if(customW)
     w = customW;
@@ -238,7 +240,33 @@ function drawBlankChart(customW, customH){
 
 // add fancy lines to cost chart then update file
 async function drawSolanaCostChartImage(){
-  const image = await loadImage("./solanaCostChart_blank.png");
+  timesCostChartCalled ++;
+  let image;
+  try{
+    image = await loadImage("./solanaCostChart_blank.png");
+  }catch{
+    console.log("(img) Generating new blank cost chart");
+    drawBlankChart();
+    let t = Date.now()+500;
+    while(Date.now() < t){}
+    console.log("(img) New blank cost chart generated")
+    try{
+      image = await loadImage("./solanCostChart_blank.png");
+    }catch{
+      console.log("(img) Err loading blank cost chart");
+      if(timesCostChartCalled > 5){
+        console.log(`(img) Errors loading blank chart... a lot of them, like seriously, I tried to load the image ${timesCostChartCalled} times`);
+        return;
+      }
+      return drawSolanaCostChartImage();;
+    }
+  }
+
+  if(timesCostChartCalled > 1)
+  console.log("(img) Success loading images");
+
+  timesCostChartCalled = 0;
+  
   let w = image.width, h = image.height;
   const canvas = createCanvas(image.width, image.height);//createCanvas(w, h);
   const ctx = canvas.getContext('2d');
@@ -285,6 +313,13 @@ async function drawSolanaCostChartImage(){
   const buffer = canvas.toBuffer("image/png");
   fs.writeFileSync(`./solanaCostChart_latest.png`, buffer);
 }
+
+function updateInterest(){
+
+}
+
+// weekly compunding of interest
+setInterval(updateInterest, 604800000)
 
 function commafy(num) {
   num = num.toString();
