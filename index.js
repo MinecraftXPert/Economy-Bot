@@ -240,30 +240,48 @@ async function drawBlankChart(customW, customH){
 
 // add fancy lines to cost chart then update file
 async function drawSolanaCostChartImage(){
+  
   timesCostChartCalled ++;
+
+  // blank chart file retrieval
   let image;
   try{
+
+    // wow, it just worked first time, that's so nice
     image = await loadImage("./solanaCostChart_blank.png");
+
   }catch{
+
+    // ofcourse, it didn't work first time. well, I guess we need to let the user know then try to draw a new chart
     console.log("(img) Generating new blank cost chart");
     drawBlankChart();
+
+    // create a half second delay to allow for slight delays in file creation
     let t = Date.now()+500;
     while(Date.now() < t){}
-    console.log("(img) New blank cost chart generated")
+    console.log("(img) New blank cost chart generated");
+
+    // alright, the new chart was generated. let's try this again
     try{
+
+      // yay! It worked!
       image = await loadImage("./solanCostChart_blank.png");
+
     }catch{
+
+      // well.... this isn't the best place to be. I'm gonna call myself again and see if it will just... fix itself. maybe the file hadn't fully saved yet?
       console.log("(img) Err loading blank cost chart");
+
       if(timesCostChartCalled > 5){
+        // wait. I tried calling myself FOUR TIMES ALREADY!!!! Well, I guess I'll give up
         console.log(`(img) Errors loading blank chart... a lot of them, like seriously, I tried to load the image ${timesCostChartCalled} times`);
         return;
       }
+
+      // calling function x within function x is crazy work. At least there's infinite loop protection in the if statement above
       return drawSolanaCostChartImage();;
     }
   }
-
-  if(timesCostChartCalled > 1)
-  console.log("(img) Success loading images");
 
   timesCostChartCalled = 0;
   
@@ -314,12 +332,14 @@ async function drawSolanaCostChartImage(){
   fs.writeFileSync(`./solanaCostChart_latest.png`, buffer);
 }
 
-function updateInterest(){
 
-}
+// shhh, don't tell anyone about the WIP functions
+// function updateInterest(){
 
-// weekly compunding of interest
-setInterval(updateInterest, 604800000)
+// }
+
+// // weekly compunding of interest
+// setInterval(updateInterest, 604800000)
 
 function commafy(num) {
   num = num.toString();
@@ -600,8 +620,6 @@ client.on("messageCreate", async (message) => {
       return;
     }
 
-    const serverId = message.guild.id; // get the ID of the server that the user joined in
-
     if (storage[message.author.id]) {
       const embed = new EmbedBuilder()
         .setColor("Green")
@@ -629,9 +647,6 @@ client.on("messageCreate", async (message) => {
     storage[message.author.id].numJobsCanApply = 5;
     // here for filtering out the all the other jobs when someone tries to apply because obviously they're gonna be at level one when first joining
     storage[message.author.id].jobLevel = 1;
-
-    // Add the server ID to the user object in storage.json
-    storage[message.author.id].serverId = serverId;
 
     save();
   }
@@ -1916,8 +1931,11 @@ client.on("messageCreate", async (message) => {
     if (isNaN(costOfSolana)) {
       costOfSolana = 175;
     }
+    
+    const costChart = new AttachmentBuilder('./solanaCostChart_latest.png', {name: 'cost.png'});
 
     const embed = new EmbedBuilder()
+      .setImage('attachment://cost.png')
       .setTitle("Cost of Solana")
       .setColor("Green")
       .setDescription(
@@ -1930,8 +1948,6 @@ client.on("messageCreate", async (message) => {
       })
       .setTimestamp();
 
-    const costChart = new AttachmentBuilder('./solanaCostChart_latest.png', {name: 'cost.png'});
-   
     message.channel.send({ embeds: [embed], files: [costChart]});
   }
 
@@ -2103,24 +2119,125 @@ client.on("messageCreate", async (message) => {
     }
   }
 
-  if(command === "manage" && storage[message.author.id].contributor){
+  if(command === "manage" && (storage[message.author.id].contributor || storage[message.author.id].admin)){
     switch(args[0]){
 
       // persistent channels for cost charts
       case "pc" || "persistentchannels":
 
+
+        // adding persistent channels
         if(args[1] === "add"){
-          storage.persistentChannels.push(args[3])
+          
+          // duplication protection
+          if(storage.persistentChannels.includes(args[2])){
+            message.channel.send(`${args[2]} is already a persistent channel. did you mean to remove it?\n\`\`\`$manage pc rem ${args[2]}\`\`\``);
+            return;
+          }
+
+          // adding argument #3 to the persistent channel array
+          storage.persistentChannels.push(args[2]);
+          save();
+          message.channel.send(`added channel ${args[2]}`)
+
+        // removing current persistent channels
         }else if(args[1] === "remove" || args[1] === "rem"){
+
+          // channel not found message
+          if(!storage.persistentChannels.includes(args[2])){
+            message.channel.send(`${args[2]} is not a persistent channel. did you mean to add it?\n\`\`\`$manage pc add ${args[2]}\`\`\``);
+            return
+          }
+
+          // remove selected channel
           const tempChannels = storage.persistentChannels.filter(item => item !== args[2]);
           storage.persistentChannels = tempChannels;
+          save();
+
+          // verification of deletion
+          if(!storage.persistentChannels.includes(args[2])){
+            message.channel.send(`${args[2]} removed from persistent channels.`);
+            return
+          }
         }else{
-          message.channel.send("argument 2 is an invalid option")
+
+          // error protection
+          message.channel.send(`Invalid argument at position 2: ${args[1]}`)
         }
       break;
 
+
+      // special admin tools that he may or may not ever use
+      case "user":
+
+        if(!(message.author.id === CLASSICNOAH || storage[message.author.id].admin)){
+          message.channel.send("Sorry, only the bot's owner and administrators can use this command");
+          return;
+        }
+
+        let userid = args[1];
+        let field = args[3];
+        
+        if(!storage.userid){
+          message.channel.send("user does not exist");
+          return;
+        }
+
+        if(args[2] === "add"){
+
+          // contributor
+          if(field === "con" || field === "contributor"){
+            if(storage.userid.contributor){
+              return message.channel.send("User is already a contributor");
+            }else{
+              storage.userid.contributor = true;
+              save();
+              return message.channel.send(`User ${userid} is now a contributor`);
+            }
+          }
+
+
+          // admin (BOT OWNER ONLY)
+          if(field === "admin" && message.author.id === CLASSICNOAH){
+            if(storage.userid.admin){
+              return message.channel.send("User is already a admin");
+            }else{
+              storage.userid.admin = true;
+              save();
+              return message.channel.send(`User ${userid} is now a admin`);
+            }
+          }
+
+        }else if(args[2] === "rem" || args[2] === "remove"){
+
+          // contributor
+          if(field === "con" || field === "contributor"){
+            if(!storage.userid.contributor){
+              return message.channel.send("User is not marked a contributor");
+            }else{
+              storage.userid.contributor = false;
+              save();
+              return message.channel.send(`User ${userid} is no longer a contributor`);
+            }
+          }
+
+          // admin (BOT OWNER ONLY)
+          if(field === "admin"){
+            if(!storage.userid.admin && message.author.id === CLASSICNOAH){
+              return message.channel.send("User is not marked a admin");
+            }else{
+              storage.userid.admin = false;
+              save();
+              return message.channel.send(`User ${userid} is no longer a admin`);
+            }
+          }
+        }
+        
+        
+      break;
+
       default:
-        message.channel.send("please enter valid option");
+        message.channel.send("please enter valid argument");
       break;
     }
   }
